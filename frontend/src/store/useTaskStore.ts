@@ -21,7 +21,7 @@ interface TaskState {
   isLoading: boolean;
   realtimeChannel: RealtimeChannel | null;
   fetchTasks: () => Promise<void>;
-  addTask: (task: Omit<Task, 'id' | 'created_at' | 'is_completed'>) => Promise<void>;
+  addTask: (task: Omit<Task, 'id' | 'created_at' | 'is_completed'>) => Promise<string | null>;
   updateTask: (id: string, data: Partial<Task>) => Promise<void>;
   toggleTask: (id: string) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
@@ -118,12 +118,26 @@ export const useTaskStore = create<TaskState>((set, get) => ({
            return { tasks: state.tasks.filter(t => t.id !== tempId) };
         }
         return {
-          tasks: state.tasks.map(t => t.id === tempId ? response.data : t)
+           tasks: state.tasks.map(t => t.id === tempId ? response.data : t)
         };
       });
-    } catch (error) {
+      return null;
+    } catch (error: any) {
       console.error('Failed to add task', error);
       set((state) => ({ tasks: state.tasks.filter(t => t.id !== tempId) }));
+      // Tell the caller WHY it failed so the UI can say so instead of
+      // silently swallowing the task.
+      const status = error?.response?.status;
+      if (!error?.response) {
+        return 'Could not reach the server. Make sure the backend is running, then try again.';
+      }
+      if (status === 401) {
+        return 'Your session expired. Please log out and log back in, then try again.';
+      }
+      if (status === 503) {
+        return 'The server is not configured yet. Please try again later.';
+      }
+      return error?.response?.data?.error || 'Could not save this task. Please try again.';
     }
   },
 
