@@ -7,7 +7,9 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
   <link rel="mask-icon" href="/favicon.svg" color="#000000">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#000000" />
+  <meta name="theme-color" content="#09090B" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   
   <title>Trackiyo - Master Your Habits</title>
   <meta name="description" content="Trackiyo is a meticulously crafted tool designed to help you build better routines, analyze your progress, and optimize your wellness." />
@@ -24,7 +26,30 @@
   <meta name="twitter:description" content="Trackiyo is a meticulously crafted tool designed to help you build better routines, analyze your progress, and optimize your wellness." />
   
   <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <!-- Theme init: applies stored theme + mode before first paint to avoid a
+       flash of the wrong theme. Keys must match useThemeStore. -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('trackiyo-theme-id') || 'kinetic';
+        var m = localStorage.getItem('trackiyo-theme-mode');
+        if (m !== 'light' && m !== 'dark' && m !== 'system') {
+          var c = document.cookie.match(/(?:^|; )theme=([^;]*)/);
+          m = (c && decodeURIComponent(c[1]) === 'light') ? 'light' : 'dark';
+        }
+        var dark = m === 'dark' || (m === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        var root = document.documentElement;
+        root.dataset.theme = t;
+        if (dark) root.classList.add('dark');
+        root.style.colorScheme = dark ? 'dark' : 'light';
+      } catch (e) {
+        document.documentElement.dataset.theme = 'kinetic';
+      }
+    })();
+  </script>
 </head>
 
 <body>

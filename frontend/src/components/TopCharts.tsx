@@ -1,6 +1,8 @@
 import React, { useMemo, useRef } from 'react';
 import { useHabitStore } from '../store/useHabitStore';
-import { useThemeStore } from '../store/useThemeStore';
+import { useThemeTokens } from '../store/useThemeStore';
+import { useToday } from '../hooks/useToday';
+import { isHabitApplicableOn } from '../utils/dailyTracking';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, AreaChart, Area } from 'recharts';
 import { parseISO, format, addDays, getDaysInMonth, startOfMonth, getWeekOfMonth } from 'date-fns';
 import gsap from 'gsap';
@@ -8,7 +10,8 @@ import { useGSAP } from '@gsap/react';
 
 export const TopCharts: React.FC = () => {
   const { habits, habitLogs, currentMonthId } = useHabitStore();
-  const { isDarkMode } = useThemeStore();
+  const t = useThemeTokens();
+  const todayStr = useToday();
   
   const dailyRef = useRef<HTMLDivElement>(null);
   const weeklyRef = useRef<HTMLDivElement>(null);
@@ -30,29 +33,35 @@ export const TopCharts: React.FC = () => {
       const daysCount = getDaysInMonth(date);
       const start = startOfMonth(date);
       
-      const data = [];
-      const totalHabits = habits.length;
+      const data: { dateStr: string; habitPercentage: number | null }[] = [];
 
       for (let i = 0; i < daysCount; i++) {
         const currentDate = addDays(start, i);
         const dateStr = format(currentDate, 'yyyy-MM-dd');
         
-        // Habit progress
+        // Only habits that existed that day count; future days and days
+        // with no applicable habits are null (no data), not 0%.
+        const applicable = habits.filter(h => isHabitApplicableOn(h, dateStr));
+        if (applicable.length === 0 || dateStr > todayStr) {
+          data.push({ dateStr, habitPercentage: null });
+          continue;
+        }
+
         let habitCompleted = 0;
-        habits.forEach(h => {
-          if (habitLogs[`${h.id}_${dateStr}`]) habitCompleted++;
+        applicable.forEach(h => {
+          if (habitLogs[`${h.id}_${dateStr}`] === true) habitCompleted++;
         });
 
         data.push({
           dateStr: dateStr,
-          habitPercentage: totalHabits > 0 ? (habitCompleted / totalHabits) * 100 : 0
+          habitPercentage: (habitCompleted / applicable.length) * 100
         });
       }
       return data;
     } catch {
       return [];
     }
-  }, [habits, habitLogs, currentMonthId]);
+  }, [habits, habitLogs, currentMonthId, todayStr]);
 
   const weeklyProgress = useMemo(() => {
     const weeks = [
@@ -65,6 +74,7 @@ export const TopCharts: React.FC = () => {
     ];
     
     dailyProgress.forEach((d, i) => {
+      if (d.habitPercentage === null) return;
       const date = addDays(startOfMonth(parseISO(`${currentMonthId}-01`)), i);
       const weekIndex = getWeekOfMonth(date, { weekStartsOn: 1 }) - 1;
       if (weeks[weekIndex]) {
@@ -73,65 +83,65 @@ export const TopCharts: React.FC = () => {
       }
     });
 
-    return weeks.filter(w => w.count > 0).map(w => ({
-      name: w.name,
-      percentage: w.count > 0 ? w.value / w.count : 0
-    }));
+    return weeks
+      .filter(w => w.count > 0)
+      .map(w => ({
+        name: w.name,
+        percentage: w.count > 0 ? w.value / w.count : 0
+      }));
   }, [dailyProgress, currentMonthId]);
 
   // Shared Tooltip Style for Premium Look
   const tooltipStyle = {
-    backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.9)',
-    backdropFilter: 'blur(10px)',
-    border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.1)',
-    borderRadius: '12px',
-    color: isDarkMode ? '#fff' : '#000',
+    backgroundColor: t.surface,
+    border: `1px solid ${t.border}`,
+    borderRadius: '6px',
+    color: t.fg,
     fontSize: '12px',
-    fontWeight: 'bold',
-    boxShadow: isDarkMode ? '0 8px 32px rgba(0,0,0,0.5)' : '0 8px 32px rgba(0,0,0,0.1)',
+    fontWeight: 600,
+    boxShadow: t.shadow === 'none' ? undefined : t.shadow,
     padding: '8px 12px'
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 w-full mb-6 flex-shrink-0 transition-colors duration-300">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 w-full flex-shrink-0 transition-colors duration-200">
       
       {/* Daily Habits Completion Trend (Area Chart) */}
-      <div ref={dailyRef} className="bg-white dark:bg-[#0a0a0a] border border-zinc-200 dark:border-zinc-800/50 rounded-2xl p-4 md:p-6 shadow-[0_0_20px_rgba(0,0,0,0.05)] dark:shadow-xl relative overflow-hidden group transition-colors duration-300">
-        <div className="absolute inset-0 bg-gradient-to-br from-black/5 dark:from-white/[0.02] to-transparent pointer-events-none transition-colors duration-300" />
-        <div className="flex justify-between items-end mb-6 relative z-10">
+      <div ref={dailyRef} className="bg-surface border border-border/70 rounded-md p-4 md:p-5 relative overflow-hidden group transition-colors duration-200">
+        <div className="flex justify-between items-end mb-4 relative z-10">
           <div>
-            <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Habits Trend</h3>
-            <div className="text-xl md:text-2xl font-black text-zinc-900 dark:text-white transition-colors duration-300">Daily Consistency</div>
+            <h3 className="text-[11px] font-semibold text-muted uppercase tracking-[0.14em] mb-1">Habits Trend</h3>
+            <div className="text-xl md:text-2xl font-bold tracking-tight text-foreground transition-colors duration-200">Daily Consistency</div>
           </div>
         </div>
-        <div className="h-[180px] w-full relative z-10">
+        <div className="h-[160px] w-full relative z-10">
           <ResponsiveContainer width="99%" height="100%">
             <AreaChart data={dailyProgress} margin={{ top: 10, right: 0, left: -25, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorHabit" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={isDarkMode ? "#ffffff" : "#000000"} stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor={isDarkMode ? "#ffffff" : "#000000"} stopOpacity={0}/>
+                  <stop offset="5%" stopColor={t.accent} stopOpacity={0.35}/>
+                  <stop offset="95%" stopColor={t.accent} stopOpacity={0}/>
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? "#27272a" : "#e5e7eb"} vertical={false} opacity={0.5} />
+              <CartesianGrid strokeDasharray="3 3" stroke={t.border} vertical={false} opacity={0.5} />
               <XAxis 
                 dataKey="dateStr" 
                 tickFormatter={(val) => parseISO(val).getDate().toString()} 
-                stroke={isDarkMode ? "#525252" : "#a1a1aa"} 
+                stroke={t.muted} 
                 fontSize={10} 
                 tickLine={false} 
                 axisLine={false} 
                 dy={10}
               />
               <YAxis 
-                stroke={isDarkMode ? "#525252" : "#a1a1aa"} 
+                stroke={t.muted} 
                 fontSize={10} 
                 tickLine={false} 
                 axisLine={false} 
                 tickFormatter={(val) => `${val}%`}
               />
               <Tooltip 
-                cursor={{ stroke: isDarkMode ? '#525252' : '#a1a1aa', strokeWidth: 1, strokeDasharray: '4 4' }} 
+                cursor={{ stroke: t.border, strokeWidth: 1, strokeDasharray: '4 4' }} 
                 contentStyle={tooltipStyle}
                 formatter={(value: any) => [`${Math.round(value)}%`, 'Completion']}
                 labelFormatter={(label) => format(parseISO(label as string), 'MMM d, yyyy')}
@@ -139,11 +149,11 @@ export const TopCharts: React.FC = () => {
               <Area 
                 type="monotone" 
                 dataKey="habitPercentage" 
-                stroke={isDarkMode ? "#ffffff" : "#000000"} 
-                strokeWidth={3}
+                stroke={t.accent} 
+                strokeWidth={2.5}
                 fillOpacity={1} 
                 fill="url(#colorHabit)" 
-                activeDot={{ r: 6, fill: isDarkMode ? '#000' : '#fff', stroke: isDarkMode ? '#fff' : '#000', strokeWidth: 2 }}
+                activeDot={{ r: 5, fill: t.accent, stroke: t.bg, strokeWidth: 2 }}
               />
             </AreaChart>
           </ResponsiveContainer>
@@ -152,42 +162,41 @@ export const TopCharts: React.FC = () => {
 
 
       {/* Weekly Averages (Bar Chart) */}
-      <div ref={weeklyRef} className="bg-white dark:bg-[#0a0a0a] border border-zinc-200 dark:border-zinc-800/50 rounded-2xl p-4 md:p-6 shadow-[0_0_20px_rgba(0,0,0,0.05)] dark:shadow-xl relative overflow-hidden group transition-colors duration-300">
-        <div className="absolute inset-0 bg-gradient-to-br from-black/5 dark:from-white/[0.02] to-transparent pointer-events-none transition-colors duration-300" />
-        <div className="flex justify-between items-end mb-6 relative z-10">
+      <div ref={weeklyRef} className="bg-surface border border-border/70 rounded-md p-4 md:p-5 relative overflow-hidden group transition-colors duration-200">
+        <div className="flex justify-between items-end mb-4 relative z-10">
           <div>
-            <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Weekly Summary</h3>
-            <div className="text-xl md:text-2xl font-black text-zinc-900 dark:text-white transition-colors duration-300">Average Success</div>
+            <h3 className="text-[11px] font-semibold text-muted uppercase tracking-[0.14em] mb-1">Weekly Summary</h3>
+            <div className="text-xl md:text-2xl font-bold tracking-tight text-foreground transition-colors duration-200">Average Success</div>
           </div>
         </div>
-        <div className="h-[180px] w-full relative z-10">
+        <div className="h-[160px] w-full relative z-10">
           <ResponsiveContainer width="99%" height="100%">
             <BarChart data={weeklyProgress} margin={{ top: 10, right: 0, left: -25, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? "#27272a" : "#e5e7eb"} vertical={false} opacity={0.5} />
+              <CartesianGrid strokeDasharray="3 3" stroke={t.border} vertical={false} opacity={0.5} />
               <XAxis 
                 dataKey="name" 
-                stroke={isDarkMode ? "#525252" : "#a1a1aa"} 
+                stroke={t.muted} 
                 fontSize={10} 
                 tickLine={false} 
                 axisLine={false} 
                 dy={10}
               />
               <YAxis 
-                stroke={isDarkMode ? "#525252" : "#a1a1aa"} 
+                stroke={t.muted} 
                 fontSize={10} 
                 tickLine={false} 
                 axisLine={false} 
                 tickFormatter={(val) => `${val}%`}
               />
               <Tooltip 
-                cursor={{ fill: isDarkMode ? '#27272a' : '#f4f4f5', opacity: 0.4 }} 
+                cursor={{ fill: t.elevated, opacity: 0.4 }} 
                 contentStyle={tooltipStyle}
                 formatter={(value: any) => [`${Math.round(value)}%`, 'Weekly Avg']}
               />
               <Bar 
                 dataKey="percentage" 
-                fill={isDarkMode ? "#525252" : "#a1a1aa"} 
-                radius={[4, 4, 0, 0]} 
+                fill={t.accent} 
+                radius={[3, 3, 0, 0]} 
                 maxBarSize={40}
                 animationDuration={1500}
                 animationEasing="ease-out"

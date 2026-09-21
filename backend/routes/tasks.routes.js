@@ -25,15 +25,20 @@ router.post('/', async (req, res) => {
   try {
     const supabase = createSupabaseClient(req);
     const { title, description, priority, category, due_date } = req.body;
+
+    if (!title || typeof title !== 'string' || !title.trim()) {
+      return res.status(400).json({ error: 'Task title is required.' });
+    }
     
     const { data, error } = await supabase
       .from('tasks')
       .insert([{
         user_id: req.user.id,
-        title,
+        title: title.trim(),
         description,
         priority: priority || 'Low',
         category: category || 'General',
+        status: 'pending',
         due_date
       }])
       .select('id, title, description, priority, category, due_date, created_at, is_completed')

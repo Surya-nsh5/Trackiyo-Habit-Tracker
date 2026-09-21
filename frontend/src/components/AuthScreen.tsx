@@ -4,7 +4,7 @@ import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { FiMail, FiLock, FiUser, FiArrowRight, FiAlertCircle, FiArrowLeft, FiEye, FiEyeOff } from 'react-icons/fi';
 
-export const AuthScreen: React.FC = () => {
+export const AuthScreen: React.FC<{ modal?: boolean }> = ({ modal = false }) => {
   const { initialAuthMode, login, signup, resetOnboarding } = useAuthStore();
   const [isLogin, setIsLogin] = useState(initialAuthMode === 'login');
   
@@ -64,40 +64,49 @@ export const AuthScreen: React.FC = () => {
   };
 
   return (
-    <div ref={containerRef} className="h-screen w-screen bg-zinc-50 dark:bg-black flex items-center justify-center p-6 text-zinc-600 dark:text-zinc-300 font-sans transition-colors duration-300">
-      
-      {/* Abstract Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] bg-blue-500/10 dark:bg-blue-900/20 blur-[120px] rounded-full mix-blend-multiply dark:mix-blend-screen animate-pulse transition-colors duration-300"></div>
-        <div className="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] bg-purple-500/10 dark:bg-purple-900/20 blur-[100px] rounded-full mix-blend-multiply dark:mix-blend-screen animate-pulse transition-colors duration-300" style={{ animationDelay: '2s' }}></div>
-      </div>
+    <div
+      ref={containerRef}
+      className={
+        modal
+          ? 'relative w-full max-w-[420px] font-sans'
+          : 'h-dvh w-screen bg-background flex items-center justify-center p-4 sm:p-6 text-muted font-sans transition-colors duration-200'
+      }
+    >
 
-      <div className="gsap-auth-box will-change-transform w-full max-w-[420px] bg-white/80 dark:bg-zinc-900/40 backdrop-blur-2xl rounded-3xl border border-zinc-200 dark:border-zinc-700/50 p-8 shadow-[0_8px_32px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)] relative z-10 flex flex-col items-center transition-colors duration-300">
+      {/* Abstract Background Elements (full page only; the modal has its own backdrop) */}
+      {!modal && (
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] bg-accent/[0.06] blur-[120px] rounded-full transition-colors duration-200"></div>
+        <div className="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] bg-accent/[0.04] blur-[100px] rounded-full transition-colors duration-200"></div>
+      </div>
+      )}
+
+      <div className="gsap-auth-box will-change-transform w-full max-w-[420px] bg-surface rounded-md border border-border/70 p-6 sm:p-8 relative z-10 flex flex-col items-center transition-colors duration-200">
         
         {/* Back Button */}
         <button 
           type="button"
           onClick={resetOnboarding}
-          className="absolute top-6 left-6 p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800/50 text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
-          title="Back to Landing Page"
+          className="absolute top-4 left-4 sm:top-6 sm:left-6 p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded bg-elevated text-muted hover:text-accent transition-colors duration-200"
+          title={modal ? 'Close' : 'Back to Landing Page'}
         >
           <FiArrowLeft size={18} />
         </button>
 
         {/* Logo */}
-        <div className="w-14 h-14 rounded-2xl bg-black dark:bg-white flex items-center justify-center shadow-[0_0_20px_rgba(0,0,0,0.1)] dark:shadow-[0_0_20px_rgba(255,255,255,0.15)] mb-8 transition-colors duration-300">
-          <span className="text-white dark:text-black text-3xl font-black font-sans leading-none pt-1">T</span>
+        <div className="w-14 h-14 rounded bg-accent flex items-center justify-center mb-8 transition-colors duration-200">
+          <span className="text-accent-ink text-3xl font-bold font-sans leading-none pt-1">T</span>
         </div>
 
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white tracking-widest mb-2 text-center uppercase transition-colors duration-300">
+        <h1 className="text-2xl font-bold text-foreground tracking-[0.08em] mb-2 text-center uppercase transition-colors duration-200">
           {isLogin ? 'Welcome Back' : 'Create Account'}
         </h1>
-        <p className="text-xs text-zinc-500 mb-6 text-center tracking-wider transition-colors duration-300">
+        <p className="text-sm text-muted mb-6 text-center tracking-[0.02em] transition-colors duration-200">
           {isLogin ? 'Enter your details to access your dashboard.' : 'Start tracking your habits beautifully.'}
         </p>
 
         {error && (
-          <div className="w-full bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs p-3 rounded-lg mb-6 flex items-start gap-2 transition-colors duration-300">
+          <div className="w-full bg-error/10 border border-error/20 text-error text-xs p-3 rounded mb-6 flex items-start gap-2 transition-colors duration-200">
             <FiAlertCircle className="flex-shrink-0 mt-0.5" />
             <p>{error}</p>
           </div>
@@ -106,45 +115,45 @@ export const AuthScreen: React.FC = () => {
         <form ref={formRef} onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
           
           {!isLogin && (
-            <div className="gsap-auth-stagger flex items-center bg-zinc-50 dark:bg-zinc-900/60 backdrop-blur-sm border border-zinc-200 dark:border-zinc-700/60 rounded-xl px-4 h-12 focus-within:border-zinc-400 dark:focus-within:border-white focus-within:bg-white dark:focus-within:bg-zinc-900/90 focus-within:shadow-[0_0_15px_rgba(0,0,0,0.05)] dark:focus-within:shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-all">
-              <FiUser className="text-zinc-400 dark:text-zinc-500 mr-3" size={18} />
+            <div className="gsap-auth-stagger flex items-center bg-elevated border border-border/70 rounded px-4 h-12 min-h-[44px] focus-within:border-accent transition-colors duration-200">
+              <FiUser className="text-muted mr-3" size={18} />
               <input 
                 type="text" 
                 placeholder="Full Name" 
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required={!isLogin}
-                className="bg-transparent w-full h-full text-sm text-zinc-900 dark:text-white focus:outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
+                className="bg-transparent w-full h-full text-sm text-foreground focus:outline-none placeholder:text-muted"
               />
             </div>
           )}
 
-          <div className="gsap-auth-stagger flex items-center bg-zinc-50 dark:bg-zinc-900/60 backdrop-blur-sm border border-zinc-200 dark:border-zinc-700/60 rounded-xl px-4 h-12 focus-within:border-zinc-400 dark:focus-within:border-white focus-within:bg-white dark:focus-within:bg-zinc-900/90 focus-within:shadow-[0_0_15px_rgba(0,0,0,0.05)] dark:focus-within:shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-all">
-            <FiMail className="text-zinc-400 dark:text-zinc-500 mr-3" size={18} />
+          <div className="gsap-auth-stagger flex items-center bg-elevated border border-border/70 rounded px-4 h-12 min-h-[44px] focus-within:border-accent transition-colors duration-200">
+            <FiMail className="text-muted mr-3" size={18} />
             <input 
               type="email" 
               placeholder="Email Address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required 
-              className="bg-transparent w-full h-full text-sm text-zinc-900 dark:text-white focus:outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
+              className="bg-transparent w-full h-full text-sm text-foreground focus:outline-none placeholder:text-muted"
             />
           </div>
 
-          <div className="gsap-auth-stagger flex items-center bg-zinc-50 dark:bg-zinc-900/60 backdrop-blur-sm border border-zinc-200 dark:border-zinc-700/60 rounded-xl px-4 h-12 focus-within:border-zinc-400 dark:focus-within:border-white focus-within:bg-white dark:focus-within:bg-zinc-900/90 focus-within:shadow-[0_0_15px_rgba(0,0,0,0.05)] dark:focus-within:shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-all mb-4">
-            <FiLock className="text-zinc-400 dark:text-zinc-500 mr-3 shrink-0" size={18} />
+          <div className="gsap-auth-stagger flex items-center bg-elevated border border-border/70 rounded px-4 h-12 min-h-[44px] focus-within:border-accent transition-colors duration-200 mb-4">
+            <FiLock className="text-muted mr-3 shrink-0" size={18} />
             <input 
               type={showPassword ? "text" : "password"} 
               placeholder="Password" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required 
-              className="bg-transparent w-full h-full text-sm text-zinc-900 dark:text-white focus:outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
+              className="bg-transparent w-full h-full text-sm text-foreground focus:outline-none placeholder:text-muted"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300 transition-colors focus:outline-none p-1 shrink-0 ml-2"
+              className="text-muted hover:text-foreground transition-colors duration-200 focus:outline-none p-2 min-w-[44px] min-h-[44px] flex items-center justify-center shrink-0 ml-1"
               title={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? <FiEyeOff size={16} /> : <FiEye size={16} />}
@@ -154,7 +163,7 @@ export const AuthScreen: React.FC = () => {
           <button 
             type="submit" 
             disabled={loading}
-            className="gsap-auth-stagger group h-12 w-full bg-black text-white dark:bg-white dark:text-black font-black text-sm tracking-widest rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-200 hover:scale-[1.02] active:scale-95 shadow-[0_0_20px_rgba(0,0,0,0.2)] dark:shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_30px_rgba(0,0,0,0.3)] dark:hover:shadow-[0_0_30px_rgba(255,255,255,0.4)] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none"
+            className="gsap-auth-stagger group h-12 min-h-[44px] w-full bg-accent text-accent-ink font-bold text-xs tracking-[0.16em] rounded hover:brightness-110 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none"
           >
             {loading ? 'PROCESSING...' : (isLogin ? 'LOG IN' : 'SIGN UP')}
             {!loading && <FiArrowRight className="group-hover:translate-x-1 transition-transform" />}
@@ -162,12 +171,12 @@ export const AuthScreen: React.FC = () => {
 
         </form>
 
-        <div className="mt-8 text-xs text-zinc-500 tracking-wider transition-colors duration-300">
+        <div className="mt-8 text-sm text-muted tracking-[0.02em] transition-colors duration-200">
           {isLogin ? "Don't have an account? " : "Already have an account? "}
           <button 
             type="button" 
             onClick={() => setIsLogin(!isLogin)}
-            className="text-zinc-900 dark:text-white font-bold hover:underline underline-offset-4 transition-colors duration-300"
+            className="text-accent font-semibold hover:underline underline-offset-4 transition-colors duration-200"
           >
             {isLogin ? 'Sign up' : 'Log in'}
           </button>

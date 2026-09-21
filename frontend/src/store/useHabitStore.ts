@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import api from '../services/api';
 import type { Habit, HabitLog, WellnessLog } from '../types';
 import { format } from 'date-fns';
+import { getLocalTodayStr } from '../utils/dailyTracking';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
@@ -15,8 +16,8 @@ interface HabitState {
   
   setCurrentMonth: (monthId: string) => Promise<void>;
   loadData: () => Promise<void>;
-  toggleHabitLog: (habitId: string, dateStr: string) => Promise<void>;
-  updateWellnessLog: (dateStr: string, type: 'mood' | 'sleep', value: number | null) => Promise<void>;
+  toggleHabitLog: (habitId: string, dateStr: string) => Promise<boolean>;
+  updateWellnessLog: (dateStr: string, type: 'mood' | 'sleep', value: number | null) => Promise<boolean>;
   addHabit: (name: string, icon: string, monthlyGoal: number) => Promise<void>;
   deleteHabit: (habitId: string) => Promise<void>;
   setupRealtime: (userId: string) => void;
@@ -130,6 +131,8 @@ export const useHabitStore = create<HabitState>((set, get) => ({
   loadData: async () => {
     const monthId = get().currentMonthId;
     const [year, month] = monthId.split('-');
+    const requestId = Symbol('loadData');
+    (get() as { _loadRequest?: symbol })._loadRequest = requestId;
     
     set({ isLoading: true });
     try {
@@ -137,6 +140,9 @@ export const useHabitStore = create<HabitState>((set, get) => ({
         api.get(`/habits?year=${year}&month=${month}`),
         api.get(`/wellness?year=${year}&month=${month}`)
       ]);
+
+      // Drop stale responses from rapid month switches.
+      if ((get() as { _loadRequest?: symbol })._loadRequest !== requestId) return;
 
       const habits = habitsRes.data.habits || [];
       const logsArray = habitsRes.data.logs || [];
@@ -159,11 +165,17 @@ export const useHabitStore = create<HabitState>((set, get) => ({
       });
     } catch (error) {
       console.error('Failed to load habit data', error);
-      set({ isLoading: false });
+      if ((get() as { _loadRequest?: symbol })._loadRequest === requestId) {
+        set({ isLoading: false });
+      }
     }
   },
 
   toggleHabitLog: async (habitId: string, dateStr: string) => {
+    // Date is the source of truth: only today's records are editable.
+    // Previous days are permanently read-only, future days are upcoming.
+    if (dateStr !== getLocalTodayStr()) return false;
+
     const { habitLogs } = get();
     const key = `${habitId}_${dateStr}`;
     const isCurrentlyChecked = habitLogs[key] || false;
@@ -180,8 +192,10 @@ export const useHabitStore = create<HabitState>((set, get) => ({
       await api.post('/habits/logs', {
         habit_id: habitId,
         log_date: dateStr,
-        completed: newStatus
+        completed: newStatus,
+        client_today: getLocalTodayStr()
       });
+      return true;
     } catch (error) {
       console.error('Failed to toggle habit', error);
       set({
@@ -190,10 +204,14 @@ export const useHabitStore = create<HabitState>((set, get) => ({
           [key]: isCurrentlyChecked
         }
       });
+      return false;
     }
   },
 
   updateWellnessLog: async (dateStr: string, type: 'mood' | 'sleep', value: number | null) => {
+    // Same daily rule as habits: today only.
+    if (dateStr !== getLocalTodayStr()) return false;
+
     const { wellnessLogs } = get();
     const currentData = wellnessLogs[dateStr] || { mood: null, sleep: null };
     const newData = { ...currentData, [type]: value };
@@ -208,8 +226,10 @@ export const useHabitStore = create<HabitState>((set, get) => ({
     try {
       await api.post('/wellness', {
         log_date: dateStr,
-        ...newData
+        ...newData,
+        client_today: getLocalTodayStr()
       });
+      return true;
     } catch (error) {
       console.error('Failed to update wellness log', error);
       set({
@@ -218,6 +238,7 @@ export const useHabitStore = create<HabitState>((set, get) => ({
           [dateStr]: currentData
         }
       });
+      return false;
     }
   },
 
