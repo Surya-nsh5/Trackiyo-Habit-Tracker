@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { createSupabaseClient } = require('../config/supabase');
 const { requireAuth } = require('../middleware/auth');
+const { validateDailyWrite } = require('../middleware/dailyLock');
 
 router.use(requireAuth);
 
@@ -82,7 +83,10 @@ router.delete('/:id', async (req, res) => {
 router.post('/logs', async (req, res) => {
   try {
     const supabase = createSupabaseClient(req);
-    const { habit_id, log_date, completed } = req.body;
+    // Server-side daily lock: only today's records are writable.
+    const logDate = validateDailyWrite(req, res);
+    if (!logDate) return;
+    const { habit_id, completed } = req.body;
     
     // Using upsert based on unique constraint (habit_id, log_date)
     const { data, error } = await supabase
@@ -90,7 +94,7 @@ router.post('/logs', async (req, res) => {
       .upsert({
         user_id: req.user.id,
         habit_id,
-        log_date,
+        log_date: logDate,
         completed
       }, { onConflict: 'habit_id,log_date' })
       .select('id, habit_id, log_date, completed')

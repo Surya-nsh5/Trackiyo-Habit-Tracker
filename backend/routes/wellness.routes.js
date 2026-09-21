@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { createSupabaseClient } = require('../config/supabase');
 const { requireAuth } = require('../middleware/auth');
+const { validateDailyWrite } = require('../middleware/dailyLock');
 
 router.use(requireAuth);
 
@@ -30,13 +31,16 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const supabase = createSupabaseClient(req);
-    const { log_date, mood, sleep, notes } = req.body;
+    // Server-side daily lock: only today's records are writable.
+    const logDate = validateDailyWrite(req, res);
+    if (!logDate) return;
+    const { mood, sleep, notes } = req.body;
     
     const { data, error } = await supabase
       .from('wellness')
       .upsert({
         user_id: req.user.id,
-        log_date,
+        log_date: logDate,
         mood,
         sleep,
         notes

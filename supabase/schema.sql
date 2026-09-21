@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS public.tasks (
   title TEXT NOT NULL,
   description TEXT DEFAULT '',
   priority TEXT CHECK (priority IN ('Low', 'Medium', 'High')) DEFAULT 'Low',
-  status TEXT DEFAULT 'pending',
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'completed')),
   is_completed BOOLEAN DEFAULT false,
   category TEXT DEFAULT 'General',
   due_date TIMESTAMPTZ,
