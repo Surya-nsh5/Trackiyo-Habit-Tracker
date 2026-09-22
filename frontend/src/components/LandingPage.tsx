@@ -6,6 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { FiArrowRight, FiCheckCircle, FiBarChart2, FiHeart } from 'react-icons/fi';
 import { ResponsiveContainer, AreaChart, Area, Tooltip } from 'recharts';
+import { AndroidDownload } from './AndroidDownload';
 
 const mockData = [
   { name: 'Mon', score: 30 },
@@ -25,12 +26,12 @@ export const LandingPage: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
-    // Hero Entrance
+    // Hero Entrance (clearProps guarantees natural resting styles after play)
     const tl = gsap.timeline();
-    tl.from('.gsap-hero-title', { y: 50, opacity: 0, duration: 1, ease: 'expo.out', stagger: 0.1 })
-      .from('.gsap-hero-subtitle', { y: 30, opacity: 0, duration: 1, ease: 'power3.out' }, '-=0.6')
-      .from('.gsap-hero-btn', { scale: 0.9, opacity: 0, duration: 0.8, ease: 'back.out(1.5)' }, '-=0.6')
-      .from('.gsap-showcase', { x: 50, opacity: 0, duration: 1, ease: 'power3.out' }, '-=0.8');
+    tl.from('.gsap-hero-title', { y: 50, opacity: 0, duration: 1, ease: 'expo.out', stagger: 0.1, clearProps: 'transform,opacity' })
+      .from('.gsap-hero-subtitle', { y: 30, opacity: 0, duration: 1, ease: 'power3.out', clearProps: 'transform,opacity' }, '-=0.6')
+      .from('.gsap-hero-btn', { scale: 0.9, opacity: 0, duration: 0.8, ease: 'back.out(1.5)', clearProps: 'transform,opacity' }, '-=0.6')
+      .from('.gsap-showcase', { x: 50, opacity: 0, duration: 1, ease: 'power3.out', clearProps: 'transform,opacity' }, '-=0.8');
 
     // Scroll Animations
     gsap.utils.toArray('.gsap-feature').forEach((el: any, i) => {
@@ -191,6 +192,9 @@ export const LandingPage: React.FC = () => {
 
         </div>
       </section>
+
+      {/* Android App Download */}
+      <AndroidDownload />
 
       {/* Footer */}
       <footer className="relative z-10 border-t border-border/60 py-10 text-center mt-20 transition-colors duration-200">

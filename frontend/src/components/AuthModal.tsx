@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import { AuthScreen } from './AuthScreen';
+import { useOverlayClose } from '../utils/overlayStack';
 
 /**
  * Login / signup popup over the landing page.
@@ -9,6 +10,9 @@ import { AuthScreen } from './AuthScreen';
  */
 export const AuthModal: React.FC = () => {
   const { resetOnboarding } = useAuthStore();
+
+  // Android back button closes the popup instead of the app.
+  useOverlayClose(true, resetOnboarding);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {

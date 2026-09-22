@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Trackiyo</string>
+    <string name="title_activity_main">Trackiyo</string>
+    <string name="package_name">com.trackiyo.app</string>
+    <string name="custom_url_scheme">com.trackiyo.app</string>
+</resources>

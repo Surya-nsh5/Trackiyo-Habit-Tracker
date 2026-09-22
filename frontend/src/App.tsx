@@ -3,9 +3,11 @@ import { DashboardLayout } from './components/DashboardLayout';
 import { AuthModal } from './components/AuthModal';
 import { LandingPage } from './components/LandingPage';
 import { HabitLoader } from './components/HabitLoader';
+import { NativeUpdateDialog } from './components/NativeUpdateDialog';
 import { useAuthStore } from './store/useAuthStore';
 import { useThemeStore } from './store/useThemeStore';
 import { PWAReloadPrompt } from './components/PWAReloadPrompt';
+import { initNative } from './native';
 
 const LoadingScreen = () => (
   <div className="flex h-dvh items-center justify-center bg-background text-foreground font-sans">
@@ -22,6 +24,7 @@ const App: React.FC = () => {
   useEffect(() => {
     initializeTheme();
     initializeAuth();
+    initNative();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -48,6 +51,7 @@ const App: React.FC = () => {
     <>
       {content}
       <PWAReloadPrompt />
+      <NativeUpdateDialog />
     </>
   );
 };

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FiCalendar, FiChevronDown, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { format, parseISO } from 'date-fns';
 import { getLocalTodayStr } from '../utils/dailyTracking';
+import { useOverlayClose } from '../utils/overlayStack';
 
 interface DatePickerProps {
   value: string; // YYYY-MM-DD or ''
@@ -50,6 +51,8 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   const rootRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const todayStr = getLocalTodayStr();
+
+  useOverlayClose(open, () => setOpen(false));
 
   // Close on outside interaction.
   useEffect(() => {

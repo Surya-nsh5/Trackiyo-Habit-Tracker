@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FiCheck, FiChevronDown } from 'react-icons/fi';
+import { useOverlayClose } from '../utils/overlayStack';
 
 export interface DropdownOption {
   value: string;
@@ -41,6 +42,8 @@ export const Dropdown: React.FC<DropdownProps> = ({
     0
   );
   const selected = options[selectedIndex] ?? options[0];
+
+  useOverlayClose(open, () => setOpen(false));
 
   // Close on outside interaction.
   useEffect(() => {
