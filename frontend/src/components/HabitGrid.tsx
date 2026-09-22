@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useHabitStore } from '../store/useHabitStore';
 import { useThemeStore } from '../store/useThemeStore';
 import { useToday } from '../hooks/useToday';
+import { useOverlayClose } from '../utils/overlayStack';
 import {
   addDaysStr,
   computeStreaks,
@@ -90,6 +91,8 @@ export const HabitGrid: React.FC = () => {
   const [hasPickedIcon, setHasPickedIcon] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+
+  useOverlayClose(showEmojiPicker, () => setShowEmojiPicker(false));
   // Date selector: viewing history is free, editing is today-only (enforced).
   const [selectedDate, setSelectedDate] = useState<string>(() => todayStr);
 

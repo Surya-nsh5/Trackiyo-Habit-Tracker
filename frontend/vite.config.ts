@@ -16,8 +16,8 @@ export default defineConfig({
         name: 'Trackiyo - Habit Tracker',
         short_name: 'Trackiyo',
         description: 'Master your daily habits and track your wellness with zero friction.',
-        theme_color: '#000000',
-        background_color: '#000000',
+        theme_color: '#09090B',
+        background_color: '#09090B',
         display: 'standalone',
         icons: [
           {
@@ -40,6 +40,9 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        // Serve the app shell for navigations so the PWA (and the
+        // Capacitor shell loading this same build) works offline.
+        navigateFallback: 'index.html',
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,

@@ -21,7 +21,11 @@ app.use(cors({
     
     const allowedOrigins = [
       configuredOrigin,
-      'http://localhost:5173'
+      'http://localhost:5173',
+      // Capacitor Android WebView origins (native shell)
+      'http://localhost',
+      'https://localhost',
+      'capacitor://localhost'
     ];
     
     // Allow if exact match OR if it's a Vercel preview URL (very helpful for testing)

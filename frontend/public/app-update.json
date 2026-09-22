@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0",
+  "versionCode": 1,
+  "minimumVersionCode": 1,
+  "apkUrl": "/downloads/trackiyo-v1.0.0.apk",
+  "fileSize": "3.4 MB",
+  "releasedAt": "2026-09-22",
+  "releaseNotes": [
+    "Initial Android release — same Trackiyo web app in a native shell",
+    "Automatic web updates, no reinstall needed for UI changes",
+    "Themed status bar, splash screen and Android back-button support"
+  ],
+  "sha256": "f1e08a51671a45b6b8aeb3f28b8b6e6f64f555b60b1928f029e30803b9211cf6"
+}
