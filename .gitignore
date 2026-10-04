@@ -3,6 +3,7 @@
 # ============================================================
 .env
 .env.local
+.env.*.local
 .env.development
 .env.development.local
 .env.test
@@ -10,6 +11,8 @@
 .env.production
 .env.production.local
 .env.staging
+!.env.example
+!*.env.example
 
 # ============================================================
 # Dependencies
@@ -24,10 +27,16 @@ backend/node_modules/
 dist/
 dist-ssr/
 build/
+.next/
 out/
 frontend/dist/
 frontend/dist-ssr/
 backend/dist/
+frontend/android/.gradle/
+frontend/android/build/
+frontend/android/app/build/
+*.apk
+*.aab
 
 # ============================================================
 # TypeScript cache

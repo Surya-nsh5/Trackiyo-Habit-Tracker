@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import api from '../services/api';
-import type { Habit, HabitLog, WellnessLog } from '../types';
+import type { Habit, HabitLog, WellnessLog, WellnessData, HabitFrequency } from '../types';
 import { format } from 'date-fns';
 import { getLocalTodayStr } from '../utils/dailyTracking';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
@@ -17,8 +17,9 @@ interface HabitState {
   setCurrentMonth: (monthId: string) => Promise<void>;
   loadData: () => Promise<void>;
   toggleHabitLog: (habitId: string, dateStr: string) => Promise<boolean>;
-  updateWellnessLog: (dateStr: string, type: 'mood' | 'sleep', value: number | null) => Promise<boolean>;
-  addHabit: (name: string, icon: string, monthlyGoal: number) => Promise<void>;
+  updateWellnessLog: (dateStr: string, type: 'mood' | 'sleep' | 'energy' | 'water', value: number | null) => Promise<boolean>;
+  updateWellnessEntry: (dateStr: string, fields: Partial<WellnessData>) => Promise<boolean>;
+  addHabit: (name: string, icon: string, monthlyGoal: number, frequency?: HabitFrequency, targetDays?: number) => Promise<void>;
   deleteHabit: (habitId: string) => Promise<void>;
   setupRealtime: (userId: string) => void;
   cleanupRealtime: () => void;
@@ -97,7 +98,14 @@ export const useHabitStore = create<HabitState>((set, get) => ({
             set((state) => ({
               wellnessLogs: {
                 ...state.wellnessLogs,
-                [date]: { mood: newRecord.mood, sleep: newRecord.sleep }
+                [date]: {
+                  mood: newRecord.mood ?? null,
+                  sleep: newRecord.sleep ?? null,
+                  energy: newRecord.energy ?? null,
+                  water: newRecord.water ?? null,
+                  notes: newRecord.notes ?? '',
+                  activities: Array.isArray(newRecord.activities) ? newRecord.activities : []
+                }
               }
             }));
           } else if (eventType === 'DELETE') {
@@ -154,7 +162,14 @@ export const useHabitStore = create<HabitState>((set, get) => ({
 
       const newWellnessLogs: WellnessLog = {};
       (wellnessRes.data || []).forEach((w: any) => {
-        newWellnessLogs[w.log_date] = { mood: w.mood, sleep: w.sleep };
+        newWellnessLogs[w.log_date] = {
+          mood: w.mood ?? null,
+          sleep: w.sleep ?? null,
+          energy: w.energy ?? null,
+          water: w.water ?? null,
+          notes: w.notes ?? '',
+          activities: Array.isArray(w.activities) ? w.activities : []
+        };
       });
 
       set({
@@ -208,13 +223,19 @@ export const useHabitStore = create<HabitState>((set, get) => ({
     }
   },
 
-  updateWellnessLog: async (dateStr: string, type: 'mood' | 'sleep', value: number | null) => {
+  updateWellnessLog: async (dateStr: string, type: 'mood' | 'sleep' | 'energy' | 'water', value: number | null) => {
     // Same daily rule as habits: today only.
     if (dateStr !== getLocalTodayStr()) return false;
 
     const { wellnessLogs } = get();
-    const currentData = wellnessLogs[dateStr] || { mood: null, sleep: null };
+    const currentData = wellnessLogs[dateStr] || { mood: null, sleep: null, energy: null, water: null, notes: '' };
     const newData = { ...currentData, [type]: value };
+
+    if (type === 'water') {
+      try {
+        localStorage.setItem(`trackiyo_water_${dateStr}`, String(value ?? 0));
+      } catch {}
+    }
     
     set({
       wellnessLogs: {
@@ -242,7 +263,40 @@ export const useHabitStore = create<HabitState>((set, get) => ({
     }
   },
 
-  addHabit: async (name: string, icon: string, monthlyGoal: number) => {
+  updateWellnessEntry: async (dateStr: string, fields: Partial<WellnessData>) => {
+    if (dateStr !== getLocalTodayStr()) return false;
+
+    const { wellnessLogs } = get();
+    const currentData = wellnessLogs[dateStr] || { mood: null, sleep: null, energy: null, water: null, notes: '' };
+    const newData = { ...currentData, ...fields };
+
+    set({
+      wellnessLogs: {
+        ...wellnessLogs,
+        [dateStr]: newData
+      }
+    });
+
+    try {
+      await api.post('/wellness', {
+        log_date: dateStr,
+        ...newData,
+        client_today: getLocalTodayStr()
+      });
+      return true;
+    } catch (error) {
+      console.error('Failed to update wellness entry', error);
+      set({
+        wellnessLogs: {
+          ...get().wellnessLogs,
+          [dateStr]: currentData
+        }
+      });
+      return false;
+    }
+  },
+
+  addHabit: async (name: string, icon: string, monthlyGoal: number, frequency = 'daily', targetDays = 7) => {
     const tempId = `temp-${Date.now()}`;
     const { habits } = get();
     
@@ -251,6 +305,8 @@ export const useHabitStore = create<HabitState>((set, get) => ({
       name,
       icon,
       monthly_goal: monthlyGoal,
+      frequency,
+      target_days_per_week: targetDays,
       order_index: habits.length,
       created_at: new Date().toISOString()
     };
@@ -262,6 +318,8 @@ export const useHabitStore = create<HabitState>((set, get) => ({
         name,
         icon,
         monthlyGoal,
+        frequency,
+        target_days_per_week: targetDays,
         order_index: optimisticHabit.order_index
       });
       

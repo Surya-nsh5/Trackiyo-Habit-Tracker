@@ -1,4 +1,4 @@
-const { supabaseAdmin } = require('../config/supabase');
+const { createAuthClient, supabaseAdmin } = require('../config/supabase');
 
 const requireAuth = async (req, res, next) => {
   if (!supabaseAdmin) {
@@ -9,18 +9,22 @@ const requireAuth = async (req, res, next) => {
   }
 
   const authHeader = req.headers.authorization;
+  const token = (authHeader && authHeader.startsWith('Bearer '))
+    ? authHeader.split(' ')[1]
+    : req.cookies?.sb_access_token;
   
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (!token) {
     return res.status(401).json({ 
       success: false, 
-      message: 'Authentication required. Missing Bearer token.' 
+      message: 'Authentication required. Missing Bearer token or session cookie.' 
     });
   }
 
-  const token = authHeader.split(' ')[1];
-
   try {
-    const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
+    // Fresh client per request: never verify on the shared admin singleton,
+    // or its persisted session would leak into later admin queries.
+    const authClient = createAuthClient();
+    const { data: { user }, error } = await authClient.auth.getUser(token);
 
     if (error || !user) {
       return res.status(401).json({ 

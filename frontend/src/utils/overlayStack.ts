@@ -30,6 +30,11 @@ export function closeTopOverlay(): boolean {
   return true;
 }
 
+/** Check whether any overlay is currently open in the application. */
+export function hasOpenOverlays(): boolean {
+  return stack.length > 0;
+}
+
 /** Register `onClose` while `open` is true (unregisters automatically). */
 export function useOverlayClose(open: boolean, onClose: () => void): void {
   useEffect(() => {
@@ -37,3 +42,4 @@ export function useOverlayClose(open: boolean, onClose: () => void): void {
     return pushOverlayCloser(onClose);
   }, [open, onClose]);
 }
+

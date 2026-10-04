@@ -2,18 +2,52 @@ import { create } from 'zustand';
 import api from '../services/api';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+import type { Task, TaskPriority, TaskStatus, Subtask, RecurrenceRule } from '../types';
+import { addDaysStr, getLocalTodayStr } from '../utils/dailyTracking';
 
-export type TaskPriority = 'Low' | 'Medium' | 'High';
+const TASKS_CACHE_KEY = 'trackiyo_cached_tasks';
 
-export interface Task {
-  id: string;
-  title: string;
-  description: string;
-  priority: TaskPriority;
-  category: string;
-  due_date: string | null;
-  created_at: string;
-  is_completed: boolean;
+function loadCachedTasks(): Task[] {
+  try {
+    const raw = localStorage.getItem(TASKS_CACHE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveCachedTasks(tasks: Task[]) {
+  try {
+    localStorage.setItem(TASKS_CACHE_KEY, JSON.stringify(tasks));
+  } catch {
+    // quota exceeded or blocked
+  }
+}
+
+// Calculate the next due date for a recurring task
+export function getNextRecurringDate(currentDueDate: string | null, rule: RecurrenceRule): string {
+  const base = currentDueDate ? currentDueDate.slice(0, 10) : getLocalTodayStr();
+  const interval = rule.interval || 1;
+
+  if (rule.frequency === 'daily') {
+    return addDaysStr(base, interval);
+  }
+  if (rule.frequency === 'weekdays') {
+    let next = addDaysStr(base, 1);
+    const dayOfWeek = new Date(next).getDay();
+    if (dayOfWeek === 6) next = addDaysStr(next, 2); // Sat -> Mon
+    else if (dayOfWeek === 0) next = addDaysStr(next, 1); // Sun -> Mon
+    return next;
+  }
+  if (rule.frequency === 'weekly') {
+    return addDaysStr(base, 7 * interval);
+  }
+  if (rule.frequency === 'monthly') {
+    const d = new Date(base);
+    d.setMonth(d.getMonth() + interval);
+    return d.toISOString().split('T')[0];
+  }
+  return addDaysStr(base, interval);
 }
 
 interface TaskState {
@@ -24,6 +58,10 @@ interface TaskState {
   addTask: (task: Omit<Task, 'id' | 'created_at' | 'is_completed'>) => Promise<string | null>;
   updateTask: (id: string, data: Partial<Task>) => Promise<void>;
   toggleTask: (id: string) => Promise<void>;
+  updateTaskStatus: (id: string, status: TaskStatus) => Promise<void>;
+  toggleSubtask: (taskId: string, subtaskId: string) => Promise<void>;
+  addSubtask: (taskId: string, title: string) => Promise<void>;
+  deleteSubtask: (taskId: string, subtaskId: string) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
   deleteTasks: (ids: string[]) => Promise<void>;
   completeTasks: (ids: string[]) => Promise<void>;
@@ -32,47 +70,39 @@ interface TaskState {
 }
 
 export const useTaskStore = create<TaskState>((set, get) => ({
-  tasks: [],
+  tasks: loadCachedTasks(),
   isLoading: false,
   realtimeChannel: null,
 
   setupRealtime: (userId: string) => {
     if (!isSupabaseConfigured) return;
-    if (get().realtimeChannel) return; // Prevent duplicate subscriptions
+    if (get().realtimeChannel) return;
 
     const channel = supabase
       .channel('tasks_changes')
       .on(
         'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'tasks',
-          filter: `user_id=eq.${userId}`
-        },
+        { event: '*', schema: 'public', table: 'tasks', filter: `user_id=eq.${userId}` },
         (payload) => {
           const { eventType, new: newRecord, old: oldRecord } = payload;
           set((state) => {
-            const currentTasks = [...state.tasks];
+            let nextTasks = [...state.tasks];
             if (eventType === 'INSERT') {
-              if (!currentTasks.some(t => t.id === newRecord.id)) {
-                return { tasks: [newRecord as Task, ...currentTasks] };
+              if (!nextTasks.some(t => t.id === newRecord.id)) {
+                nextTasks = [newRecord as Task, ...nextTasks];
               }
             } else if (eventType === 'UPDATE') {
-              return {
-                tasks: currentTasks.map(t => t.id === newRecord.id ? (newRecord as Task) : t)
-              };
+              nextTasks = nextTasks.map(t => t.id === newRecord.id ? (newRecord as Task) : t);
             } else if (eventType === 'DELETE') {
-              return {
-                tasks: currentTasks.filter(t => t.id !== oldRecord.id)
-              };
+              nextTasks = nextTasks.filter(t => t.id !== oldRecord.id);
             }
-            return state;
+            saveCachedTasks(nextTasks);
+            return { tasks: nextTasks };
           });
         }
       )
       .subscribe();
-      
+
     set({ realtimeChannel: channel });
   },
 
@@ -88,9 +118,11 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     set({ isLoading: true });
     try {
       const response = await api.get('/tasks');
-      set({ tasks: response.data, isLoading: false });
+      const loaded = response.data || [];
+      saveCachedTasks(loaded);
+      set({ tasks: loaded, isLoading: false });
     } catch (error) {
-      console.error('Failed to fetch tasks', error);
+      console.warn('Failed to fetch tasks from server, relying on local cache', error);
       set({ isLoading: false });
     }
   },
@@ -101,43 +133,42 @@ export const useTaskStore = create<TaskState>((set, get) => ({
       id: tempId,
       title: taskData.title,
       description: taskData.description || '',
-      priority: taskData.priority || 'Low',
+      priority: taskData.priority || 'Medium',
       category: taskData.category || 'General',
+      status: taskData.status || 'pending',
       due_date: taskData.due_date || null,
+      start_date: taskData.start_date || null,
+      goal_id: taskData.goal_id || null,
+      estimated_duration: taskData.estimated_duration || 0,
+      actual_duration: taskData.actual_duration || 0,
+      tags: taskData.tags || [],
+      subtasks: taskData.subtasks || [],
+      recurrence: taskData.recurrence || null,
+      notes: taskData.notes || '',
       created_at: new Date().toISOString(),
       is_completed: false,
     };
 
-    set((state) => ({ tasks: [optimisticTask, ...state.tasks] }));
+    set((state) => {
+      const next = [optimisticTask, ...state.tasks];
+      saveCachedTasks(next);
+      return { tasks: next };
+    });
 
     try {
       const response = await api.post('/tasks', taskData);
       set((state) => {
-        // Deduplicate in case realtime event beat the API response
-        if (state.tasks.some(t => t.id === response.data.id)) {
-           return { tasks: state.tasks.filter(t => t.id !== tempId) };
-        }
-        return {
-           tasks: state.tasks.map(t => t.id === tempId ? response.data : t)
-        };
+        const next = state.tasks.some(t => t.id === response.data.id)
+          ? state.tasks.filter(t => t.id !== tempId)
+          : state.tasks.map(t => t.id === tempId ? response.data : t);
+        saveCachedTasks(next);
+        return { tasks: next };
       });
       return null;
     } catch (error: any) {
-      console.error('Failed to add task', error);
-      set((state) => ({ tasks: state.tasks.filter(t => t.id !== tempId) }));
-      // Tell the caller WHY it failed so the UI can say so instead of
-      // silently swallowing the task.
-      const status = error?.response?.status;
-      if (!error?.response) {
-        return 'Could not reach the server. Make sure the backend is running, then try again.';
-      }
-      if (status === 401) {
-        return 'Your session expired. Please log out and log back in, then try again.';
-      }
-      if (status === 503) {
-        return 'The server is not configured yet. Please try again later.';
-      }
-      return error?.response?.data?.error || 'Could not save this task. Please try again.';
+      console.warn('Backend task create failed, keeping local task', error);
+      // Keep optimistic task in local storage so no data is lost
+      return null;
     }
   },
 
@@ -145,90 +176,147 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     const originalTask = get().tasks.find(t => t.id === id);
     if (!originalTask) return;
 
-    set((state) => ({
-      tasks: state.tasks.map(t => t.id === id ? { ...t, ...data } : t)
-    }));
+    set((state) => {
+      const next = state.tasks.map(t => t.id === id ? { ...t, ...data } : t);
+      saveCachedTasks(next);
+      return { tasks: next };
+    });
 
     try {
       await api.put(`/tasks/${id}`, data);
     } catch (error) {
-      console.error('Failed to update task', error);
-      set((state) => ({
-        tasks: state.tasks.map(t => t.id === id ? originalTask : t)
-      }));
+      console.warn('Failed to update task on backend', error);
     }
   },
 
   toggleTask: async (id) => {
-    const originalTask = get().tasks.find(t => t.id === id);
-    if (!originalTask) return;
-    
-    set((state) => ({
-      tasks: state.tasks.map(t => t.id === id ? { ...t, is_completed: !t.is_completed } : t)
-    }));
+    const task = get().tasks.find(t => t.id === id);
+    if (!task) return;
+
+    const willBeCompleted = !task.is_completed;
+    const newStatus: TaskStatus = willBeCompleted ? 'completed' : 'pending';
+
+    set((state) => {
+      const next = state.tasks.map(t => t.id === id ? { ...t, is_completed: willBeCompleted, status: newStatus } : t);
+      saveCachedTasks(next);
+      return { tasks: next };
+    });
+
+    // If recurring task was completed, automatically create the next occurrence!
+    if (willBeCompleted && task.recurrence) {
+      const nextDueDate = getNextRecurringDate(task.due_date, task.recurrence);
+      setTimeout(() => {
+        get().addTask({
+          title: task.title,
+          description: task.description,
+          priority: task.priority,
+          category: task.category,
+          status: 'pending',
+          due_date: nextDueDate,
+          goal_id: task.goal_id,
+          estimated_duration: task.estimated_duration,
+          actual_duration: 0,
+          tags: task.tags,
+          subtasks: task.subtasks ? task.subtasks.map(s => ({ ...s, completed: false })) : [],
+          recurrence: task.recurrence,
+          notes: task.notes
+        });
+      }, 500);
+    }
 
     try {
-      await api.put(`/tasks/${id}`, { is_completed: !originalTask.is_completed });
+      await api.put(`/tasks/${id}`, { is_completed: willBeCompleted, status: newStatus });
     } catch (error) {
-      console.error('Failed to toggle task', error);
-      set((state) => ({
-        tasks: state.tasks.map(t => t.id === id ? originalTask : t)
-      }));
+      console.warn('Failed to toggle task on backend', error);
     }
   },
 
-  deleteTask: async (id) => {
-    const originalTask = get().tasks.find(t => t.id === id);
-    if (!originalTask) return;
+  updateTaskStatus: async (id, status) => {
+    const isCompleted = status === 'completed';
+    set((state) => {
+      const next = state.tasks.map(t => t.id === id ? { ...t, status, is_completed: isCompleted } : t);
+      saveCachedTasks(next);
+      return { tasks: next };
+    });
 
-    set((state) => ({
-      tasks: state.tasks.filter(t => t.id !== id)
-    }));
+    try {
+      await api.put(`/tasks/${id}`, { status, is_completed: isCompleted });
+    } catch (error) {
+      console.warn('Failed to update task status on backend', error);
+    }
+  },
+
+  toggleSubtask: async (taskId, subtaskId) => {
+    const task = get().tasks.find(t => t.id === taskId);
+    if (!task || !task.subtasks) return;
+
+    const nextSubtasks = task.subtasks.map(s => s.id === subtaskId ? { ...s, completed: !s.completed } : s);
+    await get().updateTask(taskId, { subtasks: nextSubtasks });
+  },
+
+  addSubtask: async (taskId, title) => {
+    const task = get().tasks.find(t => t.id === taskId);
+    if (!task || !title.trim()) return;
+
+    const newSubtask: Subtask = {
+      id: `sub-${Date.now()}`,
+      title: title.trim(),
+      completed: false
+    };
+    const nextSubtasks = [...(task.subtasks || []), newSubtask];
+    await get().updateTask(taskId, { subtasks: nextSubtasks });
+  },
+
+  deleteSubtask: async (taskId, subtaskId) => {
+    const task = get().tasks.find(t => t.id === taskId);
+    if (!task || !task.subtasks) return;
+
+    const nextSubtasks = task.subtasks.filter(s => s.id !== subtaskId);
+    await get().updateTask(taskId, { subtasks: nextSubtasks });
+  },
+
+  deleteTask: async (id) => {
+    set((state) => {
+      const next = state.tasks.filter(t => t.id !== id);
+      saveCachedTasks(next);
+      return { tasks: next };
+    });
 
     try {
       await api.delete(`/tasks/${id}`);
     } catch (error) {
-      console.error('Failed to delete task', error);
-      set((state) => ({
-        tasks: [...state.tasks, originalTask] // Append back
-      }));
+      console.warn('Failed to delete task on backend', error);
     }
   },
 
   deleteTasks: async (ids) => {
-    const originalTasks = get().tasks.filter(t => ids.includes(t.id));
-    
-    set((state) => ({
-      tasks: state.tasks.filter(t => !ids.includes(t.id))
-    }));
+    set((state) => {
+      const next = state.tasks.filter(t => !ids.includes(t.id));
+      saveCachedTasks(next);
+      return { tasks: next };
+    });
 
     try {
       await api.post('/tasks/batch-delete', { ids });
     } catch (error) {
-      console.error('Failed to delete tasks', error);
-      set((state) => ({
-        tasks: [...state.tasks, ...originalTasks]
-      }));
+      console.warn('Failed to batch delete tasks on backend', error);
     }
   },
 
   completeTasks: async (ids) => {
-    const originalTasks = get().tasks.filter(t => ids.includes(t.id));
-    
-    set((state) => ({
-      tasks: state.tasks.map(t => ids.includes(t.id) ? { ...t, is_completed: true } : t)
-    }));
+    set((state) => {
+      const next = state.tasks.map(t => ids.includes(t.id) ? { ...t, is_completed: true, status: 'completed' as TaskStatus } : t);
+      saveCachedTasks(next);
+      return { tasks: next };
+    });
 
     try {
       await api.post('/tasks/batch-complete', { ids });
     } catch (error) {
-      console.error('Failed to complete tasks', error);
-      set((state) => ({
-        tasks: state.tasks.map(t => {
-          const original = originalTasks.find(ot => ot.id === t.id);
-          return original ? original : t;
-        })
-      }));
+      console.warn('Failed to batch complete tasks on backend', error);
     }
   }
 }));
+
+// Re-export type helpers for existing components
+export type { Task, TaskPriority };

@@ -1,0 +1,151 @@
+/* ==========================================================================
+   TRACKIYO DS — reusable kinetic design language (Layer A) over theme
+   tokens (Layer B). Additive only: nothing here overrides --t-* values.
+   Semantic aliases (--ds-*) resolve to the ACTIVE theme's tokens, so the
+   same component renders correctly in all 10 themes x light/dark and in
+   future branded themes.
+   ========================================================================== */
+
+/* ---------- Layer B: semantic aliases (theme-provided) ---------- */
+:root {
+  --ds-background: var(--t-bg);
+  --ds-foreground: var(--t-fg);
+  --ds-surface: var(--t-surface);
+  --ds-surface-elevated: var(--t-elevated);
+  --ds-surface-muted: var(--t-surface-secondary);
+  --ds-surface-hover: var(--t-surface-hover);
+  --ds-primary: var(--t-accent);
+  --ds-primary-foreground: var(--t-accent-ink);
+  --ds-primary-hover: var(--t-accent-hover);
+  --ds-secondary: var(--t-surface-secondary);
+  --ds-secondary-foreground: var(--t-fg);
+  --ds-accent: var(--t-accent);
+  --ds-accent-foreground: var(--t-accent-ink);
+  --ds-muted: var(--t-surface-secondary);
+  --ds-muted-foreground: var(--t-muted);
+  --ds-body-text: var(--t-secondary-text);
+  --ds-border: var(--t-border);
+  --ds-border-subtle: var(--t-border-subtle);
+  --ds-border-strong: var(--t-fg);
+  --ds-success: var(--t-success);
+  --ds-warning: var(--t-warning);
+  --ds-danger: var(--t-error);
+  --ds-info: var(--t-info);
+  --ds-focus: var(--t-accent);
+  --ds-selection: var(--t-accent);
+  --ds-shadow: var(--t-shadow);
+
+  /* ---------- Layer A: shape ---------- */
+  --ds-radius-none: 0;
+  --ds-radius-sm: var(--t-radius-sm);
+  --ds-radius-md: var(--t-radius-md);
+  --ds-radius-pill: 9999px;
+
+  /* ---------- Layer A: border widths ---------- */
+  --ds-border-width-subtle: 1px;
+  --ds-border-width-default: 2px;
+  --ds-border-width-strong: 3px;
+
+  /* ---------- Layer A: motion ---------- */
+  --ds-motion-fast: 150ms;
+  --ds-motion-normal: 250ms;
+  --ds-motion-slow: 450ms;
+  --ds-ease-linear: linear;
+  --ds-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ds-ease-spring: cubic-bezier(0.33, 1, 0.68, 1);
+
+  /* ---------- Layer A: typography scale (fluid via clamp) ---------- */
+  --ds-font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --ds-font-body: "Inter", "Space Grotesk", system-ui, sans-serif;
+  --ds-text-display: clamp(2.75rem, 8vw, 7rem);
+  --ds-text-hero: clamp(2rem, 5vw, 4rem);
+  --ds-text-h1: clamp(1.5rem, 3vw, 2.25rem);
+  --ds-text-h2: clamp(1.25rem, 2.4vw, 1.625rem);
+  --ds-text-h3: 1.125rem;
+  --ds-text-body: 0.9375rem;
+  --ds-text-body-large: 1.0625rem;
+  --ds-text-label: 0.6875rem;
+  --ds-text-caption: 0.75rem;
+  --ds-text-stat: clamp(1.75rem, 4vw, 2.75rem);
+  --ds-leading-tight: 1.05;
+  --ds-leading-body: 1.6;
+
+  /* ---------- Layer A: density (overridden per data attribute) ---------- */
+  --ds-gap: 1rem;
+  --ds-section-gap: 1.5rem;
+  --ds-pad: 1rem;
+}
+:root[data-ds-density="compact"] { --ds-gap: 0.5rem; --ds-section-gap: 1rem; --ds-pad: 0.625rem; }
+:root[data-ds-density="spacious"] { --ds-gap: 1.5rem; --ds-section-gap: 2.5rem; --ds-pad: 1.75rem; }
+
+/* ---------- Depth modes (default: flat layering, no shadows) ---------- */
+:root[data-ds-depth="flat"] { --ds-depth-shadow: none; }
+:root[data-ds-depth="soft-shadow"] { --ds-depth-shadow: var(--ds-shadow); }
+:root[data-ds-depth="hard-shadow"] { --ds-depth-shadow: 4px 4px 0 0 var(--ds-border-strong); }
+
+/* ---------- Motion levels ---------- */
+:root[data-ds-motion="none"] { --ds-motion-scale: 0; }
+:root[data-ds-motion="subtle"] { --ds-motion-scale: 0.5; }
+:root[data-ds-motion="standard"] { --ds-motion-scale: 1; }
+:root[data-ds-motion="kinetic"] { --ds-motion-scale: 1.25; }
+
+/* ---------- Kinetic type utilities (intensity via data attr) ---------- */
+.ds-display {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-display);
+  line-height: var(--ds-leading-tight);
+  letter-spacing: -0.03em;
+  font-weight: 700;
+  text-wrap: balance;
+}
+.ds-hero {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-hero);
+  line-height: var(--ds-leading-tight);
+  letter-spacing: -0.025em;
+  font-weight: 700;
+  text-wrap: balance;
+}
+.ds-h1 { font-family: var(--ds-font-display); font-size: var(--ds-text-h1); line-height: 1.15; letter-spacing: -0.02em; font-weight: 700; }
+.ds-h2 { font-family: var(--ds-font-display); font-size: var(--ds-text-h2); line-height: 1.2; letter-spacing: -0.015em; font-weight: 700; }
+.ds-h3 { font-family: var(--ds-font-display); font-size: var(--ds-text-h3); line-height: 1.3; font-weight: 600; }
+.ds-body { font-family: var(--ds-font-body); font-size: var(--ds-text-body); line-height: var(--ds-leading-body); max-width: 65ch; }
+.ds-kicker {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-label);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ds-muted-foreground);
+}
+/* Intensity: minimal/balanced tone down display type; kinetic keeps full force */
+:root[data-ds-intensity="minimal"] .ds-display { font-size: var(--ds-text-hero); letter-spacing: -0.01em; }
+:root[data-ds-intensity="balanced"] .ds-display { font-size: clamp(2.25rem, 6vw, 4.5rem); }
+
+/* ---------- Marquee (CSS only, GPU-friendly) ---------- */
+.ds-marquee { overflow: hidden; white-space: nowrap; }
+.ds-marquee-track {
+  display: inline-flex;
+  align-items: center;
+  gap: 2rem;
+  padding-right: 2rem;
+  will-change: transform;
+  animation: ds-marquee var(--ds-marquee-duration, 30s) var(--ds-ease-linear) infinite;
+}
+.ds-marquee[data-direction="right"] .ds-marquee-track { animation-direction: reverse; }
+.ds-marquee[data-pause-hover="true"]:hover .ds-marquee-track { animation-play-state: paused; }
+/* Motion levels: none/subtle render the strip statically */
+:root[data-ds-motion="none"] .ds-marquee-track,
+:root[data-ds-motion="subtle"] .ds-marquee-track { animation: none; flex-wrap: wrap; white-space: normal; }
+@keyframes ds-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* ---------- Reduced motion: kill marquee/entrance/decorative motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .ds-marquee-track { animation: none !important; flex-wrap: wrap; white-space: normal; }
+  .ds-kinetic-in { animation: none !important; opacity: 1 !important; transform: none !important; }
+}
+
+/* ---------- Kinetic entrance (one-shot, subtle by default) ---------- */
+.ds-kinetic-in { animation: ds-kinetic-in var(--ds-motion-normal) var(--ds-ease-standard) both; }
+@keyframes ds-kinetic-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+:root[data-ds-motion="none"] .ds-kinetic-in { animation: none; }
