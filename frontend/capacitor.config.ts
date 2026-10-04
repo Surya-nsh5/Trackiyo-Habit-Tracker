@@ -16,7 +16,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
  * backend/.env (gitignored). It can also be injected at sync time via the
  * CAP_SERVER_URL env variable, which takes precedence (useful for staging).
  */
-const PRODUCTION_URL = 'https://trackiyo.vercel.app/';
+const PRODUCTION_URL = 'https://trackiyo.vercel.app';
 
 const config: CapacitorConfig = {
   appId: 'com.trackiyo.app',
@@ -26,6 +26,7 @@ const config: CapacitorConfig = {
     url: process.env.CAP_SERVER_URL || PRODUCTION_URL,
     // Never load the app over cleartext HTTP.
     cleartext: false,
+    androidScheme: 'https',
   },
   android: {
     allowMixedContent: false,
