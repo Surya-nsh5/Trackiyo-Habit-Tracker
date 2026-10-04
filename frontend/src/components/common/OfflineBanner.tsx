@@ -58,10 +58,10 @@ export const OfflineBanner: React.FC = () => {
     return (
       <aside
         aria-label="Network status"
-        className="fixed top-0 left-0 right-0 z-[1000] bg-success/90 backdrop-blur-md text-foreground px-4 py-2 flex items-center justify-center gap-2 text-xs font-semibold shadow-md transition-all duration-300 animate-in fade-in slide-in-from-top"
+        className="fixed left-1/2 top-[calc(env(safe-area-inset-top,24px)_+_12px)] z-[9999] w-[calc(100%-2rem)] max-w-[440px] -translate-x-1/2 box-border overflow-hidden bg-success/90 backdrop-blur-md text-foreground rounded-xl px-4 py-2.5 flex items-center justify-center gap-2 text-xs font-semibold shadow-md transition-all duration-300 animate-in fade-in slide-in-from-top"
       >
         <FiCheckCircle size={14} className="text-foreground shrink-0" />
-        <span>Connection restored. You&apos;re back online.</span>
+        <span className="min-w-0 break-words">Connection restored. You&apos;re back online.</span>
       </aside>
     );
   }
@@ -71,11 +71,11 @@ export const OfflineBanner: React.FC = () => {
   return (
     <aside
       aria-label="Network status"
-      className="fixed top-0 left-0 right-0 z-[1000] bg-warning/90 backdrop-blur-md text-zinc-950 px-4 py-2 flex items-center justify-between gap-3 text-xs font-medium shadow-md transition-all duration-300 animate-in fade-in slide-in-from-top"
+      className="fixed left-1/2 top-[calc(env(safe-area-inset-top,24px)_+_12px)] z-[9999] w-[calc(100%-2rem)] max-w-[440px] -translate-x-1/2 box-border overflow-hidden bg-warning/90 backdrop-blur-md text-zinc-950 rounded-xl px-4 py-2.5 flex items-center justify-between gap-3 text-xs font-medium shadow-md transition-all duration-300 animate-in fade-in slide-in-from-top"
     >
       <div className="flex items-center gap-2 min-w-0">
         <FiWifiOff size={15} className="shrink-0 text-zinc-950" />
-        <span className="truncate">
+        <span className="min-w-0 break-words">
           You&apos;re offline. Reconnect to continue using the latest Trackiyo data.
         </span>
       </div>

@@ -244,7 +244,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   let flatCounter = 0;
 
   return (
-    <div className="fixed inset-0 z-[300] flex items-start justify-center pt-[5vh] sm:pt-[7vh] pb-6 px-3 sm:px-4 min-w-0">
+    <div className="fixed inset-0 z-[300] flex items-start justify-center pt-[max(5vh,var(--sat))] sm:pt-[7vh] pb-[max(1.5rem,var(--sab))] px-3 sm:px-4 min-w-0">
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/65 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
 

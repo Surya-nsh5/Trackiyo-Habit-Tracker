@@ -102,7 +102,7 @@ export const AuthScreen: React.FC<{ modal?: boolean }> = ({ modal = false }) => 
       className={
         modal
           ? 'relative w-full max-w-[min(420px,calc(100vw-2rem))] min-w-0 font-sans'
-          : 'h-dvh w-full max-w-full box-border bg-background flex items-center justify-center p-4 sm:p-6 text-muted font-sans transition-colors duration-200'
+          : 'h-dvh w-full max-w-full box-border bg-background flex items-center justify-center p-4 sm:p-6 pt-[max(1rem,var(--sat))] pb-[max(1rem,var(--sab))] text-muted font-sans transition-colors duration-200'
       }
     >
 

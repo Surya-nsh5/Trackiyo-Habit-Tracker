@@ -141,7 +141,7 @@ export const QuickCaptureModal: React.FC<QuickCaptureModalProps> = ({ isOpen, on
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-start justify-center pt-[10vh] px-4">
+    <div className="fixed inset-0 z-[200] flex items-start justify-center pt-[max(10vh,var(--sat))] px-4 pb-[env(safe-area-inset-bottom,0px)]">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/50 backdrop-blur-sm"

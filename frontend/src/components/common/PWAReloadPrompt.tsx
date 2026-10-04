@@ -19,7 +19,7 @@ export const PWAReloadPrompt: React.FC = () => {
   if (!needRefresh) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 bg-surface border border-border/70 rounded-md p-4 w-[calc(100vw-2rem)] max-w-sm max-h-[calc(100dvh-2rem)] overflow-y-auto text-foreground transition-colors duration-200 min-w-0 box-border">
+    <div className="fixed right-4 z-50 bg-surface border border-border/70 rounded-md p-4 w-[calc(100vw-2rem)] max-w-sm max-h-[calc(100dvh-2rem)] overflow-y-auto text-foreground transition-colors duration-200 min-w-0 box-border bottom-[max(1rem,calc(4.75rem+var(--sab)))] md:bottom-[max(1rem,var(--sab))]">
       <div className="mb-4 min-w-0">
         <p className="text-sm font-medium break-words max-w-full">
           New content available, click on reload button to update.

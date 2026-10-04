@@ -76,7 +76,7 @@ export const QuickAddMenu: React.FC<QuickAddMenuProps> = ({ isOpen, initial = nu
   };
 
   return (
-    <div className="fixed inset-0 z-[300] flex items-start justify-center pt-[12vh] px-4" role="dialog" aria-modal="true" aria-label="Quick add">
+    <div className="fixed inset-0 z-[300] flex items-start justify-center pt-[max(12vh,var(--sat))] px-4 pb-[env(safe-area-inset-bottom,0px)]" role="dialog" aria-modal="true" aria-label="Quick add">
       <div className="fixed inset-0 bg-black/60" onClick={onClose} aria-hidden="true" />
       <div className="relative w-full max-w-[min(24rem,calc(100vw-2rem))] min-w-0 max-h-[calc(100dvh-2rem)] overflow-y-auto bg-surface border border-border/80 rounded-2xl shadow-2xl flex flex-col">
         <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-border/60 flex-shrink-0 min-w-0">

@@ -32,7 +32,7 @@ export const PublicChallengeView: React.FC<PublicChallengeViewProps> = ({ token 
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4 pt-[max(1rem,var(--sat))] pb-[max(1rem,var(--sab))]">
         <div className="text-xs text-muted font-mono tracking-widest uppercase animate-pulse">
           Loading challenge result...
         </div>
@@ -42,7 +42,7 @@ export const PublicChallengeView: React.FC<PublicChallengeViewProps> = ({ token 
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4 pt-[max(1rem,var(--sat))] pb-[max(1rem,var(--sab))]">
         <div className="w-full max-w-[min(28rem,calc(100vw-2rem))] min-w-0 text-center space-y-4 bg-[#18181b] border border-[#27272a] rounded-2xl p-8">
           <div className="w-12 h-12 rounded-full bg-red-500/10 text-red-400 flex items-center justify-center mx-auto text-xl shrink-0">
             🔒
@@ -63,7 +63,7 @@ export const PublicChallengeView: React.FC<PublicChallengeViewProps> = ({ token 
   }
 
   return (
-    <div className="min-h-screen w-full max-w-full box-border bg-[#09090b] text-[#f4f4f5] flex flex-col items-center justify-center p-4 sm:p-6 font-sans min-w-0">
+    <div className="min-h-screen w-full max-w-full box-border bg-[#09090b] text-[#f4f4f5] flex flex-col items-center justify-center p-4 sm:p-6 pt-[max(1rem,var(--sat))] pb-[max(1rem,var(--sab))] font-sans min-w-0">
       <div className="w-full max-w-[min(28rem,calc(100vw-2rem))] min-w-0 bg-[#121215] border border-[#27272a] rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl relative overflow-hidden box-border">
         {/* Subtle Ambient Glow */}
         <div className="absolute -top-24 -left-24 w-48 h-48 bg-indigo-600/15 rounded-full blur-3xl pointer-events-none" />

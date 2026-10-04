@@ -88,12 +88,12 @@ export const DeepWorkMode: React.FC<DeepWorkModeProps> = ({ isActive, onExit }) 
   if (!isActive) return null;
 
   return (
-    <div className="fixed inset-0 z-[400] bg-background flex flex-col items-center justify-center gap-0 px-4 py-8 w-full max-w-full min-w-0 overflow-y-auto custom-scrollbar">
+    <div className="fixed inset-0 z-[400] bg-background flex flex-col items-center justify-center gap-0 px-4 pt-[max(2rem,var(--sat))] pb-[max(2rem,var(--sab))] w-full max-w-full min-w-0 overflow-y-auto custom-scrollbar">
 
       {/* Exit button */}
       <button
         onClick={onExit}
-        className="absolute top-5 right-5 p-2 rounded-xl text-muted hover:text-foreground hover:bg-surface-hover transition-colors shrink-0"
+        className="absolute top-[max(1.25rem,var(--sat))] right-5 p-2 rounded-xl text-muted hover:text-foreground hover:bg-surface-hover transition-colors shrink-0"
         title="Exit Deep Work Mode (Esc)"
         aria-label="Exit deep work mode"
       >

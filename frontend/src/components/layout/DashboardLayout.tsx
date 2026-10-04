@@ -169,7 +169,7 @@ export const DashboardLayout: React.FC = () => {
       {/* ----------------------------------------------------- */}
       {/* 1. DESKTOP COMPACT HORIZONTAL TOP NAVIGATION          */}
       {/* ----------------------------------------------------- */}
-      <header className="hidden md:flex items-center justify-between gap-2 h-14 px-4 lg:px-6 bg-navbar border-b border-border/70 z-40 flex-shrink-0 transition-colors select-none min-w-0 max-w-full">
+      <header className="hidden md:flex items-center justify-between gap-2 px-4 lg:px-6 bg-navbar border-b border-border/70 z-40 flex-shrink-0 transition-colors select-none min-w-0 max-w-full min-h-[calc(3.5rem+env(safe-area-inset-top,0px))] pt-[env(safe-area-inset-top,0px)]">
         {/* Left: Brand + 7 Primary Navigation Tabs */}
         <div className="flex items-center gap-6 lg:gap-7 min-w-0 flex-1">
           {/* Logo */}
@@ -281,7 +281,7 @@ export const DashboardLayout: React.FC = () => {
       {/* ----------------------------------------------------- */}
       {/* 2. MOBILE TOP HEADER (Clean, Compact)                 */}
       {/* ----------------------------------------------------- */}
-      <header className="md:hidden flex items-center justify-between gap-2 h-13 px-4 bg-navbar border-b border-border/70 z-30 flex-shrink-0 min-w-0 pt-[env(safe-area-inset-top)]">
+      <header className="md:hidden flex items-center justify-between gap-2 px-4 bg-navbar border-b border-border/70 z-30 flex-shrink-0 min-w-0 min-h-[calc(3.25rem+env(safe-area-inset-top,0px))] pt-[env(safe-area-inset-top,0px)]">
         <div
           onClick={() => setActiveView('TODAY')}
           className="flex items-center gap-2 cursor-pointer min-w-0 flex-shrink"

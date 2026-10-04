@@ -74,7 +74,7 @@ export const PublicShareView: React.FC<PublicShareViewProps> = ({ token }) => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background text-foreground p-4 font-sans">
+      <div className="min-h-screen flex items-center justify-center bg-background text-foreground p-4 pt-[max(1rem,var(--sat))] pb-[max(1rem,var(--sab))] font-sans">
         <div className="flex flex-col items-center gap-3">
           <TrackiyoLogo size={44} variant="gradient" className="animate-pulse" />
           <p className="text-xs text-muted font-medium">Loading verified record...</p>
@@ -85,7 +85,7 @@ export const PublicShareView: React.FC<PublicShareViewProps> = ({ token }) => {
 
   if (error || !data) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background text-foreground p-4 font-sans">
+      <div className="min-h-screen flex items-center justify-center bg-background text-foreground p-4 pt-[max(1rem,var(--sat))] pb-[max(1rem,var(--sab))] font-sans">
         <div className="w-full max-w-[min(28rem,calc(100vw-2rem))] min-w-0 bg-surface border border-border/80 rounded-2xl p-6 text-center space-y-4 shadow-xl">
           <div className="w-12 h-12 rounded-full bg-error/10 text-error flex items-center justify-center mx-auto shrink-0">
             <FiAlertCircle size={24} />
@@ -107,7 +107,7 @@ export const PublicShareView: React.FC<PublicShareViewProps> = ({ token }) => {
   }
 
   return (
-    <div className="min-h-screen w-full max-w-full box-border bg-background text-foreground p-4 sm:p-8 flex flex-col items-center justify-center font-sans relative overflow-hidden min-w-0">
+    <div className="min-h-screen w-full max-w-full box-border bg-background text-foreground p-4 sm:p-8 pt-[max(1rem,var(--sat))] pb-[max(1rem,var(--sab))] flex flex-col items-center justify-center font-sans relative overflow-hidden min-w-0">
       {/* Background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 max-w-full h-96 bg-accent/10 rounded-full blur-3xl pointer-events-none" />
 

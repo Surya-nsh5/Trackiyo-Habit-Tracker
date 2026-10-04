@@ -123,6 +123,15 @@
   --t-radius-sm: 4px;
   --t-radius-md: 6px;
   color-scheme: light;
+
+  /* Safe-area insets (notch, status bar, gesture bar).
+     0px fallback where the OS/WebView does not report insets.
+     Native (Capacitor) also letterboxes via StatusBar.setOverlaysWebView(false);
+     these vars are the web-side guarantee for edge-to-edge / PWA cases. */
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
 }
 
 :root.dark,
@@ -703,6 +712,21 @@ html.dark {
 }
 
 @layer utilities {
+  /* Safe-area padding utilities for top-level chrome (headers, banners,
+     drawers, fullscreen views, standalone pages). */
+  .safe-pt {
+    padding-top: var(--sat);
+  }
+
+  .safe-pb {
+    padding-bottom: var(--sab);
+  }
+
+  .safe-px {
+    padding-left: var(--sal);
+    padding-right: var(--sar);
+  }
+
   .dashboard-panel {
     @apply bg-surface border border-border rounded-md;
   }

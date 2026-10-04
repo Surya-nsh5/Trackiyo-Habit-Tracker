@@ -92,7 +92,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onNav
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-3 sm:pt-20 px-2 sm:px-4 bg-black/60 backdrop-blur-xs">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-[max(0.75rem,var(--sat))] sm:pt-20 px-2 sm:px-4 pb-[env(safe-area-inset-bottom,0px)] bg-black/60 backdrop-blur-xs">
       <div className="bg-surface border border-border/90 rounded-xl w-full max-w-[min(36rem,calc(100vw-2rem))] shadow-2xl overflow-hidden flex flex-col transition-colors min-h-0 max-h-[calc(100dvh-2rem)] min-w-0">
         
         {/* Search Input Bar */}

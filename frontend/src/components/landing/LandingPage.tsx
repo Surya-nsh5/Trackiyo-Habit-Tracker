@@ -52,7 +52,7 @@ export const LandingPage: React.FC = () => {
   }, { scope: containerRef });
 
   return (
-    <div ref={containerRef} className="bg-background min-h-screen text-muted font-sans overflow-x-hidden selection:bg-accent selection:text-accent-ink transition-colors duration-200">
+    <div ref={containerRef} className="bg-background min-h-screen text-muted font-sans overflow-x-hidden selection:bg-accent selection:text-accent-ink transition-colors duration-200 safe-pb">
 
       {/* Background Gradients */}
       <div className="fixed inset-0 pointer-events-none z-0">
@@ -61,7 +61,7 @@ export const LandingPage: React.FC = () => {
       </div>
 
       {/* Navigation */}
-      <nav className="relative z-10 flex flex-wrap items-center justify-between gap-3 p-4 sm:p-6 max-w-7xl mx-auto w-full min-w-0 box-border">
+      <nav className="relative z-10 flex flex-wrap items-center justify-between gap-3 p-4 sm:p-6 pt-[max(1rem,var(--sat))] max-w-7xl mx-auto w-full min-w-0 box-border">
         <div className="flex items-center gap-3 min-w-0">
           <TrackiyoLogo size={36} variant="gradient" />
           <span className="text-foreground font-bold tracking-[0.18em] text-base sm:text-lg transition-colors duration-200 truncate">TRACKIYO</span>

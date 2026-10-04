@@ -41,7 +41,7 @@ export const DeleteConfirmPopup: React.FC = () => {
       role="alertdialog"
       aria-modal="true"
       aria-labelledby="delete-confirm-title"
-      className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-[9999] max-w-sm sm:max-w-md w-[calc(100vw-2rem)] sm:w-auto animate-in slide-in-from-bottom-3 fade-in duration-200"
+      className="fixed bottom-[calc(5rem+var(--sab))] sm:bottom-6 right-4 sm:right-6 z-[9999] max-w-sm sm:max-w-md w-[calc(100vw-2rem)] sm:w-auto animate-in slide-in-from-bottom-3 fade-in duration-200"
     >
       <div className="bg-surface/95 dark:bg-[#141517]/95 backdrop-blur-xl border border-rose-500/25 dark:border-rose-500/30 rounded-2xl p-3 sm:px-4 sm:py-3 shadow-2xl shadow-black/50 ring-1 ring-black/10 dark:ring-white/5 flex flex-wrap sm:flex-nowrap items-center gap-3 max-h-[calc(100dvh-6rem)] overflow-y-auto">
         {/* Minimal Icon Badge */}
