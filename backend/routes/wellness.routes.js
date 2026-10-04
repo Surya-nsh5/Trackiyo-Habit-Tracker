@@ -11,7 +11,7 @@ router.get('/', async (req, res) => {
     const supabase = createSupabaseClient(req);
     const { month, year } = req.query;
     
-    let query = supabase.from('wellness').select('id, log_date, mood, sleep, notes').eq('user_id', req.user.id);
+    let query = supabase.from('wellness').select('*').eq('user_id', req.user.id);
     
     if (month && year) {
       const startDate = new Date(year, month - 1, 1).toISOString().split('T')[0];
@@ -21,8 +21,11 @@ router.get('/', async (req, res) => {
 
     const { data, error } = await query.order('log_date', { ascending: false });
 
-    if (error) throw error;
-    res.status(200).json(data);
+    if (error) {
+      if (error.code === '42P01') return res.status(200).json([]);
+      throw error;
+    }
+    res.status(200).json(data || []);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -34,19 +37,44 @@ router.post('/', async (req, res) => {
     // Server-side daily lock: only today's records are writable.
     const logDate = validateDailyWrite(req, res);
     if (!logDate) return;
-    const { mood, sleep, notes } = req.body;
+    const { mood, sleep, energy, water, notes, activities } = req.body;
     
-    const { data, error } = await supabase
+    const payload = {
+      user_id: req.user.id,
+      log_date: logDate,
+      mood: mood !== undefined ? mood : null,
+      sleep: sleep !== undefined ? sleep : null,
+      energy: energy !== undefined ? energy : null,
+      water: water !== undefined ? water : null,
+      notes: notes || '',
+      activities: Array.isArray(activities) ? activities : []
+    };
+
+    let { data, error } = await supabase
       .from('wellness')
-      .upsert({
+      .upsert(payload, { onConflict: 'user_id,log_date' })
+      .select('*')
+      .single();
+
+    // Fallback if extended columns do not exist in older table schema
+    if (error && (error.code === '42703' || error.message?.includes('column'))) {
+      const corePayload = {
         user_id: req.user.id,
         log_date: logDate,
-        mood,
-        sleep,
-        notes
-      }, { onConflict: 'user_id,log_date' })
-      .select('id, log_date, mood, sleep, notes')
-      .single();
+        mood: mood !== undefined ? mood : null,
+        sleep: sleep !== undefined ? sleep : null,
+        notes: notes || ''
+      };
+      const retry = await supabase
+        .from('wellness')
+        .upsert(corePayload, { onConflict: 'user_id,log_date' })
+        .select('*')
+        .single();
+      if (!retry.error) {
+        data = { ...retry.data, ...payload };
+        error = null;
+      }
+    }
 
     if (error) throw error;
     res.status(200).json(data);

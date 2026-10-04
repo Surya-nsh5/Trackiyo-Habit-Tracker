@@ -41,22 +41,94 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const supabase = createSupabaseClient(req);
-    const { name, icon, monthlyGoal, order_index } = req.body;
+    const { name, icon, monthlyGoal, order_index, frequency, target_days_per_week } = req.body;
     
-    const { data, error } = await supabase
+    if (!name || typeof name !== 'string' || !name.trim()) {
+      return res.status(400).json({ error: 'Habit name is required.' });
+    }
+
+    const payload = {
+      user_id: req.user.id,
+      name: name.trim(),
+      icon: icon || '📌',
+      monthly_goal: parseInt(monthlyGoal) || 0,
+      order_index: parseInt(order_index) || 0
+    };
+
+    if (frequency !== undefined) payload.frequency = frequency;
+    if (target_days_per_week !== undefined) payload.target_days_per_week = target_days_per_week;
+
+    let { data, error } = await supabase
       .from('habits')
-      .insert([{
-        user_id: req.user.id,
-        name,
-        icon,
-        monthly_goal: monthlyGoal,
-        order_index: order_index || 0
-      }])
-      .select('id, name, icon, monthly_goal, order_index, created_at')
+      .insert([payload])
+      .select('*')
       .single();
+
+    if (error && (error.code === '42703' || error.message?.includes('column'))) {
+      delete payload.frequency;
+      delete payload.target_days_per_week;
+      const retry = await supabase
+        .from('habits')
+        .insert([payload])
+        .select('id, name, icon, monthly_goal, order_index, created_at')
+        .single();
+      if (retry.error) throw retry.error;
+      data = retry.data;
+      error = null;
+    }
 
     if (error) throw error;
     res.status(201).json(data);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+router.put('/:id', async (req, res) => {
+  try {
+    const supabase = createSupabaseClient(req);
+    const { id } = req.params;
+    const updates = { ...req.body };
+    delete updates.id;
+    delete updates.user_id;
+
+    if (updates.name !== undefined) {
+      if (typeof updates.name !== 'string' || !updates.name.trim()) {
+        return res.status(400).json({ error: 'Habit name cannot be empty.' });
+      }
+      updates.name = updates.name.trim();
+    }
+
+    let { data, error } = await supabase
+      .from('habits')
+      .update(updates)
+      .eq('id', id)
+      .eq('user_id', req.user.id)
+      .select('*')
+      .single();
+
+    if (error && (error.code === '42703' || error.message?.includes('column'))) {
+      const safeUpdates = {
+        name: updates.name,
+        icon: updates.icon,
+        monthly_goal: updates.monthly_goal || updates.monthlyGoal,
+        order_index: updates.order_index
+      };
+      Object.keys(safeUpdates).forEach(k => safeUpdates[k] === undefined && delete safeUpdates[k]);
+      const retry = await supabase
+        .from('habits')
+        .update(safeUpdates)
+        .eq('id', id)
+        .eq('user_id', req.user.id)
+        .select('*')
+        .single();
+      if (retry.error) throw retry.error;
+      data = retry.data;
+      error = null;
+    }
+
+    if (error) throw error;
+    res.status(200).json(data);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

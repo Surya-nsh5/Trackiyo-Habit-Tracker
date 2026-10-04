@@ -30,7 +30,19 @@ const createSupabaseClient = (req) => {
 
 const supabaseAdmin = isConfigured ? createClient(supabaseUrl, supabaseServiceKey) : null;
 
+// Fresh anon-key client for session-establishing auth calls (signUp /
+// signIn / refresh / getUser). NEVER use the shared supabaseAdmin singleton
+// for these: gotrue persists the session on the client instance, which would
+// poison every later admin query to run as that user instead of service_role
+// (cross-request auth leak — admin reads would silently return RLS-filtered
+// rows). Per-request user queries should use createSupabaseClient(req).
+const createAuthClient = () => {
+  if (!supabaseUrl || !supabaseAnonKey) return null;
+  return createClient(supabaseUrl, supabaseAnonKey);
+};
+
 module.exports = {
   createSupabaseClient,
+  createAuthClient,
   supabaseAdmin
 };
