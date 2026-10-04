@@ -109,7 +109,7 @@ export const HomeView: React.FC = () => {
 
   return (
     <div className="h-full w-full max-w-full min-w-0 flex flex-col min-h-0 bg-background overflow-hidden transition-colors duration-200">
-      <div className="w-full max-w-full min-w-0 flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3 sm:p-5 lg:p-6">
+      <div className="w-full max-w-full min-w-0 flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3 sm:p-5 lg:p-6 pb-6 md:pb-6">
         <div className="max-w-7xl mx-auto w-full min-w-0 flex flex-col space-y-4 sm:space-y-5">
 
         {/* ------------------------------------------------------------- */}
@@ -378,7 +378,7 @@ export const HomeView: React.FC = () => {
               </form>
 
               {/* Habits List (One-click completion) */}
-              <div className="space-y-2 max-h-72 overflow-y-auto custom-scrollbar pr-0.5">
+              <div className="space-y-2 md:max-h-72 overflow-y-auto custom-scrollbar pr-0.5">
                 {habits.length === 0 ? (
                   <div className="text-center py-8">
                     <p className="text-xs text-muted">No habits added yet.</p>
@@ -495,7 +495,7 @@ export const HomeView: React.FC = () => {
               </form>
 
               {/* Tasks List */}
-              <div className="space-y-2 max-h-72 overflow-y-auto custom-scrollbar pr-0.5">
+              <div className="space-y-2 md:max-h-72 overflow-y-auto custom-scrollbar pr-0.5">
                 {todayTasks.length === 0 ? (
                   <div className="text-center py-8">
                     <p className="text-xs text-muted">No tasks scheduled for today.</p>

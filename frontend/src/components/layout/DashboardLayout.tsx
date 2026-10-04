@@ -281,7 +281,7 @@ export const DashboardLayout: React.FC = () => {
       {/* ----------------------------------------------------- */}
       {/* 2. MOBILE TOP HEADER (Clean, Compact)                 */}
       {/* ----------------------------------------------------- */}
-      <header className="md:hidden flex items-center justify-between gap-2 h-13 px-4 bg-navbar border-b border-border/70 z-30 flex-shrink-0 min-w-0">
+      <header className="md:hidden flex items-center justify-between gap-2 h-13 px-4 bg-navbar border-b border-border/70 z-30 flex-shrink-0 min-w-0 pt-[env(safe-area-inset-top)]">
         <div
           onClick={() => setActiveView('TODAY')}
           className="flex items-center gap-2 cursor-pointer min-w-0 flex-shrink"
@@ -329,73 +329,79 @@ export const DashboardLayout: React.FC = () => {
 
       {/* ----------------------------------------------------- */}
       {/* 3. MAIN WORKSPACE VIEWPORT                            */}
-      <div className="flex-1 flex flex-col min-w-0 min-h-0 bg-background overflow-hidden relative">
-        <main id="main-content" tabIndex={-1} className="flex-1 relative min-h-0 min-w-0 flex flex-col focus:outline-none overflow-hidden">
-          <ViewErrorBoundary>
-            {activeView === 'TODAY' && <HomeView />}
-            {activeView === 'HABITS' && <HabitsView />}
-            {activeView === 'TASKS' && <TasksView />}
-            {activeView === 'FOCUS' && <FocusView />}
-            {activeView === 'WELLNESS' && <WellnessTracker />}
-            {activeView === 'INSIGHTS' && <AnalyticsView />}
-            {activeView === 'SETTINGS' && <SettingsPage />}
-            {activeView === 'CONNECT' && <FriendsView />}
-          </ViewErrorBoundary>
-        </main>
+      {/* On mobile the main content sits between header and    */}
+      {/* bottom nav. flex-1 + min-h-0 ensures it fills the     */}
+      {/* remaining space and allows inner overflow-y-auto to   */}
+      {/* scroll independently of the nav.                      */}
+      {/* ----------------------------------------------------- */}
+      <main id="main-content" tabIndex={-1} className="flex-1 relative min-h-0 min-w-0 flex flex-col focus:outline-none overflow-hidden bg-background">
+        <ViewErrorBoundary>
+          {activeView === 'TODAY' && <HomeView />}
+          {activeView === 'HABITS' && <HabitsView />}
+          {activeView === 'TASKS' && <TasksView />}
+          {activeView === 'FOCUS' && <FocusView />}
+          {activeView === 'WELLNESS' && <WellnessTracker />}
+          {activeView === 'INSIGHTS' && <AnalyticsView />}
+          {activeView === 'SETTINGS' && <SettingsPage />}
+          {activeView === 'CONNECT' && <FriendsView />}
+        </ViewErrorBoundary>
+      </main>
 
-        {/* ----------------------------------------------------- */}
-        {/* 4. MOBILE BOTTOM NAVIGATION (Touch-Friendly)          */}
-        {/* ----------------------------------------------------- */}
-        <nav aria-label="Mobile Navigation" className="md:hidden flex-shrink-0 min-h-[58px] h-[calc(58px+env(safe-area-inset-bottom))] bg-navbar/95 border-t border-border/70 flex items-stretch justify-center px-1 z-30 relative backdrop-blur-md pb-[env(safe-area-inset-bottom)] box-border">
-          <div className="flex items-stretch justify-around w-full max-w-lg">
-            {(
-              [
-                { id: 'TODAY', label: 'Today', Icon: FiHome },
-                { id: 'HABITS', label: 'Habits', Icon: FiCheckCircle },
-                { id: 'TASKS', label: 'Tasks', Icon: FiCheckSquare },
-                { id: 'FOCUS', label: 'Focus', Icon: FiClock },
-                { id: 'WELLNESS', label: 'Wellness', Icon: FiActivity },
-              ] as const
-            ).map(({ id, label, Icon }) => {
-              const isActive = activeView === id;
-              return (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => setActiveView(id)}
-                  aria-current={isActive ? 'page' : undefined}
-                  className={`flex flex-col items-center justify-center gap-0.5 flex-1 min-w-0 min-h-[44px] h-full transition-colors relative ${
-                    isActive ? 'text-accent font-bold' : 'text-muted hover:text-foreground'
-                  }`}
-                >
-                  <Icon size={18} />
-                  <span className="text-[9px] uppercase tracking-wider font-semibold truncate max-w-full">{label}</span>
-                  {isActive && (
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-accent rounded-b-full" />
-                  )}
-                </button>
-              );
-            })}
+      {/* ----------------------------------------------------- */}
+      {/* 4. MOBILE BOTTOM NAVIGATION (Touch-Friendly)          */}
+      {/* Now a direct child of the root flex column so it      */}
+      {/* never overlaps main content — the flexbox layout      */}
+      {/* automatically gives main the correct remaining space. */}
+      {/* ----------------------------------------------------- */}
+      <nav aria-label="Mobile Navigation" className="md:hidden flex-shrink-0 bg-navbar/95 border-t border-border/70 flex items-stretch justify-center px-1 z-30 relative backdrop-blur-md box-border" style={{ minHeight: '58px', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+        <div className="flex items-stretch justify-around w-full max-w-lg">
+          {(
+            [
+              { id: 'TODAY', label: 'Today', Icon: FiHome },
+              { id: 'HABITS', label: 'Habits', Icon: FiCheckCircle },
+              { id: 'TASKS', label: 'Tasks', Icon: FiCheckSquare },
+              { id: 'FOCUS', label: 'Focus', Icon: FiClock },
+              { id: 'WELLNESS', label: 'Wellness', Icon: FiActivity },
+            ] as const
+          ).map(({ id, label, Icon }) => {
+            const isActive = activeView === id;
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setActiveView(id)}
+                aria-current={isActive ? 'page' : undefined}
+                className={`flex flex-col items-center justify-center gap-0.5 flex-1 min-w-0 min-h-[44px] h-full transition-colors relative ${
+                  isActive ? 'text-accent font-bold' : 'text-muted hover:text-foreground'
+                }`}
+              >
+                <Icon size={18} />
+                <span className="text-[9px] uppercase tracking-wider font-semibold truncate max-w-full">{label}</span>
+                {isActive && (
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-accent rounded-b-full" />
+                )}
+              </button>
+            );
+          })}
 
-            {/* Mobile More Button */}
-            <button
-              type="button"
-              onClick={() => setIsMobileMoreOpen(true)}
-              className={`flex flex-col items-center justify-center gap-0.5 flex-1 min-w-0 min-h-[44px] h-full transition-colors relative ${
-                ['INSIGHTS', 'SETTINGS', 'CONNECT'].includes(activeView)
-                  ? 'text-accent font-bold'
-                  : 'text-muted hover:text-foreground'
-              }`}
-            >
-              <FiMoreHorizontal size={18} />
-              <span className="text-[9px] uppercase tracking-wider font-semibold truncate max-w-full">More</span>
-              {['INSIGHTS', 'SETTINGS', 'CONNECT'].includes(activeView) && (
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-accent rounded-b-full" />
-              )}
-            </button>
-          </div>
-        </nav>
-      </div>
+          {/* Mobile More Button */}
+          <button
+            type="button"
+            onClick={() => setIsMobileMoreOpen(true)}
+            className={`flex flex-col items-center justify-center gap-0.5 flex-1 min-w-0 min-h-[44px] h-full transition-colors relative ${
+              ['INSIGHTS', 'SETTINGS', 'CONNECT'].includes(activeView)
+                ? 'text-accent font-bold'
+                : 'text-muted hover:text-foreground'
+            }`}
+          >
+            <FiMoreHorizontal size={18} />
+            <span className="text-[9px] uppercase tracking-wider font-semibold truncate max-w-full">More</span>
+            {['INSIGHTS', 'SETTINGS', 'CONNECT'].includes(activeView) && (
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-accent rounded-b-full" />
+            )}
+          </button>
+        </div>
+      </nav>
 
       {/* Mobile More Sheet / Drawer */}
       {isMobileMoreOpen && (
