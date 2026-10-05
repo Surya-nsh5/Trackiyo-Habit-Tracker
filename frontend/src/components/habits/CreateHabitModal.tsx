@@ -65,8 +65,8 @@ export const CreateHabitModal: React.FC<CreateHabitModalProps> = ({ isOpen, onCl
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-xs">
-      <div className="bg-surface border-t sm:border border-border rounded-t-xl sm:rounded-xl p-4 sm:p-6 w-full max-w-[calc(100vw-2rem)] sm:max-w-md min-w-0 max-h-[calc(100dvh-2rem)] sm:max-h-[92vh] overflow-y-auto custom-scrollbar shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-xs pt-[env(safe-area-inset-top,0px)] pb-[env(safe-area-inset-bottom,0px)] px-[env(safe-area-inset-left,0px)]">
+      <div className="bg-surface border-t sm:border border-border rounded-t-xl sm:rounded-xl p-4 sm:p-6 w-full max-w-[calc(100vw-2rem)] sm:max-w-md min-w-0 max-h-[calc(100dvh-2rem-env(safe-area-inset-top,0px))] sm:max-h-[88vh] overflow-y-auto custom-scrollbar shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between gap-2 pb-3 mb-4 border-b border-border/60 min-w-0">
           <h3 className="text-base sm:text-lg font-bold text-foreground tracking-[0.08em] uppercase min-w-0 break-words flex-1">

@@ -132,11 +132,11 @@ export const HabitDetailModal: React.FC<HabitDetailModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-labelledby="habit-detail-name"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-background/80 backdrop-blur-sm animate-fadeIn"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-background/80 backdrop-blur-sm animate-fadeIn pt-[env(safe-area-inset-top,0px)] pb-[env(safe-area-inset-bottom,0px)] px-[env(safe-area-inset-left,0px)]"
       onClick={onClose}
     >
       <div
-        className="bg-surface border border-border/80 rounded-2xl w-full max-w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[calc(100dvh-2rem)] sm:max-h-[92vh] min-w-0 flex flex-col shadow-2xl overflow-hidden focus:outline-none"
+        className="bg-surface border border-border/80 rounded-2xl w-full max-w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[calc(100dvh-2rem-env(safe-area-inset-top,0px))] sm:max-h-[88vh] min-w-0 flex flex-col shadow-2xl overflow-hidden focus:outline-none"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

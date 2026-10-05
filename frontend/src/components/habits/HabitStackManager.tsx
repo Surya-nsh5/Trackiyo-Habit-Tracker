@@ -160,9 +160,9 @@ export const HabitStackManager: React.FC = () => {
 
       {/* Add/Edit Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 safe-pt safe-pb safe-px">
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowModal(false)} />
-          <div className="relative bg-surface border border-border/80 rounded-2xl shadow-2xl p-4 sm:p-6 w-full max-w-[calc(100vw-2rem)] sm:max-w-md min-w-0 z-10 max-h-[calc(100dvh-2rem)] sm:max-h-[85vh] overflow-y-auto custom-scrollbar">
+          <div className="relative bg-surface border border-border/80 rounded-2xl shadow-2xl p-4 sm:p-6 w-full max-w-[calc(100vw-2rem)] sm:max-w-md min-w-0 z-10 max-h-[calc(100dvh-2rem-var(--sat)-var(--sab))] sm:max-h-[85vh] overflow-y-auto custom-scrollbar">
             <div className="flex items-center justify-between gap-2 mb-5 min-w-0">
               <h3 className="text-sm font-bold text-foreground min-w-0 flex-1 break-words">
                 {editingStack ? 'Edit Stack' : 'New Habit Stack'}

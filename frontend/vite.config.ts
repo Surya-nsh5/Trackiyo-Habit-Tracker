@@ -35,7 +35,7 @@ export default defineConfig({
     react(),
     trackiyoVersionPlugin(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       includeAssets: [
         'favicon.svg',
         'apple-touch-icon.png',
@@ -47,7 +47,7 @@ export default defineConfig({
         'windows-tile-310x310.png'
       ],
       manifest: {
-        id: '/',
+        id: 'com.trackiyo.app',
         name: 'Trackiyo - Habit Tracker & Wellness',
         short_name: 'Trackiyo',
         description: 'Master your daily habits, boost focus, and optimize wellness with zero friction.',
@@ -58,6 +58,7 @@ export default defineConfig({
         orientation: 'any',
         scope: '/',
         start_url: '/',
+        categories: ['productivity', 'lifestyle', 'utilities'],
         icons: [
           {
             src: 'pwa-64x64.png',
@@ -113,6 +114,7 @@ export default defineConfig({
         ]
       },
       workbox: {
+        cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         // Serve the app shell for navigations so the PWA (and the
         // Capacitor shell loading this same build) works offline.
@@ -126,7 +128,7 @@ export default defineConfig({
               cacheName: 'google-fonts-cache',
               expiration: {
                 maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365 // <== 365 days
+                maxAgeSeconds: 60 * 60 * 24 * 365
               },
               cacheableResponse: {
                 statuses: [0, 200]
@@ -140,7 +142,28 @@ export default defineConfig({
               cacheName: 'gstatic-fonts-cache',
               expiration: {
                 maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365 // <== 365 days
+                maxAgeSeconds: 60 * 60 * 24 * 365
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
+          {
+            // Sensitive auth routes - NEVER cache in Service Worker
+            urlPattern: /\/api\/(auth|login|signup|user|session)\/.*/i,
+            handler: 'NetworkOnly'
+          },
+          {
+            // General API routes - NetworkFirst with short timeout to prevent stale data
+            urlPattern: /\/api\/.*/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'trackiyo-api-cache-v1',
+              networkTimeoutSeconds: 5,
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 15 // 15 mins
               },
               cacheableResponse: {
                 statuses: [0, 200]

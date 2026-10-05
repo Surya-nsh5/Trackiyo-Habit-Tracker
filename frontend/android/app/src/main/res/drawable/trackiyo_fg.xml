@@ -1,15 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Trackiyo launcher foreground (vector: crisp at every density).
-     Acid tile + black "T", matching the web brand mark. -->
+<!-- Trackiyo Android Adaptive Launcher Foreground.
+     Gradient squircle tile with the official white Trackiyo Momentum "T" glyph. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+    
+    <!-- Outer Brand Gradient Tile (centered in safe zone, 72x72 at x=18, y=18, rx=20) -->
     <path
-        android:fillColor="#DFE104"
-        android:pathData="M38,22 H70 A16,16 0 0 1 86,38 V70 A16,16 0 0 1 70,86 H38 A16,16 0 0 1 22,70 V38 A16,16 0 0 1 38,22 Z" />
+        android:pathData="M38,18 H70 A20,20 0 0 1 90,38 V70 A20,20 0 0 1 70,90 H38 A20,20 0 0 1 18,70 V38 A20,20 0 0 1 38,18 Z">
+        <gradient
+            android:startX="18"
+            android:startY="18"
+            android:endX="90"
+            android:endY="90"
+            android:type="linear">
+            <item android:offset="0.0" android:color="#6366F1"/>
+            <item android:offset="0.5" android:color="#4F46E5"/>
+            <item android:offset="1.0" android:color="#06B6D4"/>
+        </gradient>
+    </path>
+
+    <!-- White Trackiyo Momentum T Glyph (scaled & centered in safe zone) -->
     <path
-        android:fillColor="#000000"
-        android:pathData="M40,38 H68 V48 H59 V72 H49 V48 H40 Z" />
+        android:fillColor="#FFFFFF"
+        android:pathData="M 34.2 31.8 H 73.8 C 77.1 31.8 79.8 34.5 79.8 37.8 C 79.8 41.1 77.1 43.8 73.8 43.8 H 60 V 67 C 60 70.8 62.6 73.4 66.5 73.4 C 69.1 73.4 71.7 72.1 73.4 70 L 79.8 76.9 C 75.9 81.2 71.2 83.8 65.2 83.8 C 55.3 83.8 48 76.5 48 67 V 43.8 H 34.2 C 30.9 43.8 28.2 41.1 28.2 37.8 C 28.2 34.5 30.9 31.8 34.2 31.8 Z" />
 </vector>

@@ -237,7 +237,7 @@ export const AnalyticsView: React.FC = () => {
 
   return (
     <div className="analytics-view-container h-full w-full max-w-full min-w-0 min-h-0 overflow-y-auto custom-scrollbar p-3 md:p-4 lg:p-5 outline-none">
-      <div className="max-w-7xl mx-auto w-full min-w-0 flex flex-col gap-3 md:gap-4 relative">
+      <div className="w-full max-w-full min-w-0 flex flex-col gap-3 md:gap-4 relative">
 
       {/* Top Header & Period Filter */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/70 pb-4 flex-shrink-0 w-full max-w-full min-w-0">

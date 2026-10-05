@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTemplateStore } from '../../store/useTemplateStore';
+import { useTaskStore } from '../../store/useTaskStore';
+import { useHabitStore } from '../../store/useHabitStore';
 import { FiPlus, FiTrash2, FiCheck } from 'react-icons/fi';
 import type { Template } from '../../types';
 
@@ -20,7 +22,8 @@ export const TemplatePicker: React.FC<TemplatePickerProps> = ({ type, onApply, c
     try {
       const res = await applyTemplate(id);
       onApply?.(res);
-      window.location.reload();
+      useTaskStore.getState().fetchTasks(true);
+      useHabitStore.getState().loadData(true);
     } catch {}
   };
 

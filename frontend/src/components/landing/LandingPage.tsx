@@ -61,7 +61,7 @@ export const LandingPage: React.FC = () => {
       </div>
 
       {/* Navigation */}
-      <nav className="relative z-10 flex flex-wrap items-center justify-between gap-3 p-4 sm:p-6 pt-[max(1rem,var(--sat))] max-w-7xl mx-auto w-full min-w-0 box-border">
+      <nav className="relative z-10 flex flex-wrap items-center justify-between gap-3 p-4 sm:p-6 pt-[max(1rem,var(--sat))] w-full max-w-full min-w-0 box-border">
         <div className="flex items-center gap-3 min-w-0">
           <TrackiyoLogo size={36} variant="gradient" />
           <span className="text-foreground font-bold tracking-[0.18em] text-base sm:text-lg transition-colors duration-200 truncate">TRACKIYO</span>
@@ -83,7 +83,7 @@ export const LandingPage: React.FC = () => {
       </nav>
 
       {/* Hero Section */}
-      <main className="relative z-10 flex flex-col lg:flex-row items-center justify-between min-h-[80vh] px-6 max-w-7xl mx-auto mt-10 lg:mt-0 gap-12 w-full min-w-0 box-border">
+      <main className="relative z-10 flex flex-col lg:flex-row items-center justify-between min-h-[80vh] px-6 w-full max-w-full mt-10 lg:mt-0 gap-12 min-w-0 box-border">
 
         {/* Left: Text */}
         <div className="flex-1 w-full min-w-0 text-left flex flex-col items-center lg:items-start text-center lg:text-left">
@@ -156,7 +156,7 @@ export const LandingPage: React.FC = () => {
       </main>
 
       {/* Features Section */}
-      <section className="relative z-10 py-32 px-6 max-w-7xl mx-auto">
+      <section className="relative z-10 py-32 px-6 w-full max-w-full">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
           <div className="gsap-feature bg-elevated border border-border/70 rounded-md p-6 sm:p-8 hover:border-accent/40 transition-colors duration-200 min-w-0">

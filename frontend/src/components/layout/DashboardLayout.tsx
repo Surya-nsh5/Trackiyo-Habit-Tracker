@@ -169,7 +169,7 @@ export const DashboardLayout: React.FC = () => {
       {/* ----------------------------------------------------- */}
       {/* 1. DESKTOP COMPACT HORIZONTAL TOP NAVIGATION          */}
       {/* ----------------------------------------------------- */}
-      <header className="hidden md:flex items-center justify-between gap-2 px-4 lg:px-6 bg-navbar border-b border-border/70 z-40 flex-shrink-0 transition-colors select-none min-w-0 max-w-full min-h-[calc(3.5rem+env(safe-area-inset-top,0px))] pt-[env(safe-area-inset-top,0px)]">
+      <header className="sticky top-0 hidden md:flex items-center justify-between gap-2 px-4 lg:px-6 bg-navbar border-b border-border/70 z-50 flex-shrink-0 transition-colors select-none min-w-0 max-w-full min-h-[calc(3.5rem+env(safe-area-inset-top,0px))] pt-[env(safe-area-inset-top,0px)]">
         {/* Left: Brand + 7 Primary Navigation Tabs */}
         <div className="flex items-center gap-6 lg:gap-7 min-w-0 flex-1">
           {/* Logo */}
@@ -281,7 +281,7 @@ export const DashboardLayout: React.FC = () => {
       {/* ----------------------------------------------------- */}
       {/* 2. MOBILE TOP HEADER (Clean, Compact)                 */}
       {/* ----------------------------------------------------- */}
-      <header className="md:hidden flex items-center justify-between gap-2 px-4 bg-navbar border-b border-border/70 z-30 flex-shrink-0 min-w-0 min-h-[calc(3.25rem+env(safe-area-inset-top,0px))] pt-[env(safe-area-inset-top,0px)]">
+      <header className="sticky top-0 md:hidden flex items-center justify-between gap-2 px-4 bg-navbar border-b border-border/70 z-50 flex-shrink-0 min-w-0 min-h-[calc(3.25rem+env(safe-area-inset-top,0px))] pt-[env(safe-area-inset-top,0px)]">
         <div
           onClick={() => setActiveView('TODAY')}
           className="flex items-center gap-2 cursor-pointer min-w-0 flex-shrink"
@@ -361,7 +361,6 @@ export const DashboardLayout: React.FC = () => {
               { id: 'HABITS', label: 'Habits', Icon: FiCheckCircle },
               { id: 'TASKS', label: 'Tasks', Icon: FiCheckSquare },
               { id: 'FOCUS', label: 'Focus', Icon: FiClock },
-              { id: 'WELLNESS', label: 'Wellness', Icon: FiActivity },
             ] as const
           ).map(({ id, label, Icon }) => {
             const isActive = activeView === id;
@@ -389,14 +388,14 @@ export const DashboardLayout: React.FC = () => {
             type="button"
             onClick={() => setIsMobileMoreOpen(true)}
             className={`flex flex-col items-center justify-center gap-0.5 flex-1 min-w-0 min-h-[44px] h-full transition-colors relative ${
-              ['INSIGHTS', 'SETTINGS', 'CONNECT'].includes(activeView)
+              ['WELLNESS', 'INSIGHTS', 'SETTINGS', 'CONNECT'].includes(activeView)
                 ? 'text-accent font-bold'
                 : 'text-muted hover:text-foreground'
             }`}
           >
             <FiMoreHorizontal size={18} />
             <span className="text-[9px] uppercase tracking-wider font-semibold truncate max-w-full">More</span>
-            {['INSIGHTS', 'SETTINGS', 'CONNECT'].includes(activeView) && (
+            {['WELLNESS', 'INSIGHTS', 'SETTINGS', 'CONNECT'].includes(activeView) && (
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-accent rounded-b-full" />
             )}
           </button>
@@ -427,6 +426,19 @@ export const DashboardLayout: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-2.5">
+              <button
+                type="button"
+                onClick={() => { setActiveView('WELLNESS'); setIsMobileMoreOpen(false); }}
+                className={`p-3 rounded-xl border text-left flex items-center gap-2.5 transition-colors ${
+                  activeView === 'WELLNESS'
+                    ? 'border-accent bg-accent/10 text-accent font-bold'
+                    : 'border-border-subtle bg-surface-secondary text-foreground'
+                }`}
+              >
+                <FiActivity size={16} />
+                <span className="text-xs font-semibold">Wellness</span>
+              </button>
+
               <button
                 type="button"
                 onClick={() => { setActiveView('INSIGHTS'); setIsMobileMoreOpen(false); }}
@@ -464,15 +476,6 @@ export const DashboardLayout: React.FC = () => {
               >
                 <FiSettings size={16} />
                 <span className="text-xs font-semibold">Settings</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => { setIsAIOpen(true); setIsMobileMoreOpen(false); }}
-                className="p-3 rounded-xl border border-accent/30 bg-accent/10 text-accent font-semibold text-left flex items-center gap-2.5"
-              >
-                <FiZap size={16} />
-                <span className="text-xs font-bold">AI Coach</span>
               </button>
             </div>
           </div>

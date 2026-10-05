@@ -37,7 +37,7 @@ export const AuthModal: React.FC = () => {
 
   return (
     <div
-      className="fixed inset-0 z-50 overflow-y-auto"
+      className="fixed inset-0 z-50 overflow-y-auto safe-pt safe-pb safe-px"
       role="dialog"
       aria-modal="true"
       aria-label="Log in or sign up"
@@ -48,7 +48,7 @@ export const AuthModal: React.FC = () => {
         onClick={resetOnboarding}
         className="fixed inset-0 bg-black/60 cursor-default"
       />
-      <div className="relative min-h-full flex items-center justify-center p-4 sm:p-6 pointer-events-none">
+      <div className="relative min-h-[calc(100dvh-var(--sat)-var(--sab))] flex items-center justify-center p-4 sm:p-6 pointer-events-none">
         <div className="pointer-events-auto w-full max-w-[min(420px,calc(100vw-2rem))] min-w-0">
           <AuthScreen modal />
         </div>

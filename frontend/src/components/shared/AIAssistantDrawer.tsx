@@ -133,7 +133,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({ isOpen, on
       onClick={onClose}
     >
       <div
-        className="bg-surface border-l border-border/90 w-full max-w-[min(34rem,100vw)] min-w-0 h-full max-h-[100dvh] flex flex-col shadow-2xl transition-colors duration-200 safe-pt safe-pb"
+        className="bg-surface border-l border-border/90 w-full max-w-[min(34rem,100vw)] min-w-0 h-full max-h-[100dvh] flex flex-col shadow-2xl transition-colors duration-200 safe-pt safe-pb safe-px"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"

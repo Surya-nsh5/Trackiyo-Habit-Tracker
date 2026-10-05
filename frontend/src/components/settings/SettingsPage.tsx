@@ -506,7 +506,7 @@ export const SettingsPage: React.FC = () => {
 
   return (
     <div ref={containerRef} className="h-full w-full max-w-full min-w-0 min-h-0 overflow-y-auto custom-scrollbar p-3 md:p-4 lg:p-5">
-      <div className="w-full max-w-7xl min-w-0 mx-auto space-y-6 pb-20">
+      <div className="w-full max-w-full min-w-0 space-y-6 pb-20">
 
         {/* Top Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/70 pb-4 flex-shrink-0 w-full max-w-full min-w-0">

@@ -44,7 +44,7 @@ export const HabitsView: React.FC = () => {
 
   return (
     <div className="h-full w-full max-w-full min-w-0 flex flex-col min-h-0 p-3 md:p-4 lg:p-5 overflow-hidden">
-      <div className="max-w-7xl mx-auto w-full min-w-0 h-full flex flex-col min-h-0 gap-3 md:gap-4 relative">
+      <div className="w-full max-w-full min-w-0 h-full flex flex-col min-h-0 gap-3 md:gap-4 relative">
         {/* Top Header */}
         <div className="flex items-center justify-between gap-3 border-b border-border/70 pb-3 md:pb-4 flex-shrink-0 flex-wrap w-full max-w-full min-w-0">
           <div className="min-w-0 flex-1">
@@ -94,8 +94,8 @@ export const HabitsView: React.FC = () => {
             </div>
           </div>
 
-          {/* Best Streak */}
-          <div className="bg-surface border border-border/80 rounded-xl p-3 sm:p-3.5 flex items-center justify-between gap-2 shadow-xs transition-colors min-w-0 max-w-full">
+          {/* Best Streak (Desktop Only) */}
+          <div className="hidden sm:flex bg-surface border border-border/80 rounded-xl p-3 sm:p-3.5 items-center justify-between gap-2 shadow-xs transition-colors min-w-0 max-w-full">
             <div className="min-w-0 flex-1">
               <p className="text-accent text-[10px] font-bold tracking-[0.14em] uppercase break-words">Top Streak</p>
               <p className="text-2xl font-bold tracking-tight text-accent tabular-nums mt-0.5">
@@ -107,8 +107,8 @@ export const HabitsView: React.FC = () => {
             </div>
           </div>
 
-          {/* Monthly Consistency */}
-          <div className="bg-surface border border-border/80 rounded-xl p-3 sm:p-3.5 flex flex-col justify-between gap-1 shadow-xs transition-colors min-w-0 max-w-full">
+          {/* Monthly Consistency (Desktop Only) */}
+          <div className="hidden sm:flex bg-surface border border-border/80 rounded-xl p-3 sm:p-3.5 flex-col justify-between gap-1 shadow-xs transition-colors min-w-0 max-w-full">
             <div className="flex flex-wrap items-center justify-between gap-1 text-[10px] font-bold tracking-[0.14em] uppercase min-w-0">
               <span className="text-secondary-text">Consistency</span>
               <span className="text-accent font-bold">{monthRate}% Rate</span>

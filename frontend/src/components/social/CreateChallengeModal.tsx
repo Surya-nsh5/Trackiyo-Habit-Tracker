@@ -95,8 +95,8 @@ export const CreateChallengeModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
-      <div className="bg-surface border border-border/80 rounded-2xl p-5 sm:p-6 w-full max-w-[min(28rem,calc(100vw-2rem))] min-w-0 space-y-5 shadow-2xl my-8 max-h-[calc(100dvh-2rem)] overflow-y-auto box-border">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto safe-pt safe-pb safe-px">
+      <div className="bg-surface border border-border/80 rounded-2xl p-5 sm:p-6 w-full max-w-[min(28rem,calc(100vw-2rem))] min-w-0 space-y-5 shadow-2xl my-auto max-h-[calc(100dvh-2rem-var(--sat)-var(--sab))] overflow-y-auto box-border">
         {/* Header */}
         <div className="flex items-center justify-between gap-2 border-b border-border-subtle pb-3 min-w-0">
           <div className="flex items-center gap-2 min-w-0 flex-1">

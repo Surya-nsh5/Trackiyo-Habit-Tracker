@@ -110,7 +110,7 @@ export const FriendsView: React.FC = () => {
 
   return (
     <div className="h-full w-full max-w-full min-w-0 min-h-0 p-3 md:p-4 lg:p-5 overflow-y-auto custom-scrollbar">
-      <div className="max-w-7xl mx-auto w-full min-w-0 flex flex-col gap-3 md:gap-4">
+      <div className="w-full max-w-full min-w-0 flex flex-col gap-3 md:gap-4">
       {/* Top Header & Tab Filter */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/70 pb-4 min-w-0">
         <div className="min-w-0 flex-1">
@@ -846,8 +846,8 @@ export const FriendsView: React.FC = () => {
         const draws = profileHistory.filter(c => c.isDraw || c.myScore === c.theirScore).length;
 
         return (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
-            <div className="bg-surface border border-border/80 rounded-2xl p-6 max-w-md w-full min-w-0 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto custom-scrollbar my-auto">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto safe-pt safe-pb safe-px">
+            <div className="bg-surface border border-border/80 rounded-2xl p-6 max-w-md w-full min-w-0 space-y-4 shadow-xl max-h-[calc(100dvh-2rem-var(--sat)-var(--sab))] overflow-y-auto custom-scrollbar my-auto">
               <div className="flex items-center justify-between gap-3 min-w-0 border-b border-border-subtle pb-3">
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   <div className="w-12 h-12 rounded-full bg-accent/20 text-accent font-bold text-base flex items-center justify-center border border-accent/40 shrink-0">

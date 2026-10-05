@@ -69,11 +69,11 @@ export const StreakDetailModal: React.FC = () => {
       role="dialog"
       aria-modal="true"
       aria-labelledby="streak-detail-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-background/80 backdrop-blur-md animate-fadeIn"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-background/80 backdrop-blur-md animate-fadeIn safe-pt safe-pb safe-px"
       onClick={closeStreakModal}
     >
       <div
-        className="bg-surface border border-border/80 rounded-2xl w-full max-w-[min(42rem,calc(100vw-2rem))] min-w-0 max-h-[calc(100dvh-2rem)] flex flex-col shadow-2xl overflow-hidden box-border"
+        className="bg-surface border border-border/80 rounded-2xl w-full max-w-[min(42rem,calc(100vw-2rem))] min-w-0 max-h-[calc(100dvh-2rem-var(--sat)-var(--sab))] flex flex-col shadow-2xl overflow-hidden box-border"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}

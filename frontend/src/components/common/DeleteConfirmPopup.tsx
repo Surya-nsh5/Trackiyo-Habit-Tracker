@@ -43,7 +43,7 @@ export const DeleteConfirmPopup: React.FC = () => {
       aria-labelledby="delete-confirm-title"
       className="fixed bottom-[calc(5rem+var(--sab))] sm:bottom-6 right-4 sm:right-6 z-[9999] max-w-sm sm:max-w-md w-[calc(100vw-2rem)] sm:w-auto animate-in slide-in-from-bottom-3 fade-in duration-200"
     >
-      <div className="bg-surface/95 dark:bg-[#141517]/95 backdrop-blur-xl border border-rose-500/25 dark:border-rose-500/30 rounded-2xl p-3 sm:px-4 sm:py-3 shadow-2xl shadow-black/50 ring-1 ring-black/10 dark:ring-white/5 flex flex-wrap sm:flex-nowrap items-center gap-3 max-h-[calc(100dvh-6rem)] overflow-y-auto">
+      <div className="bg-surface/95 backdrop-blur-xl border border-rose-500/25 rounded-2xl p-3 sm:px-4 sm:py-3 shadow-2xl shadow-black/50 flex flex-wrap sm:flex-nowrap items-center gap-3 max-h-[calc(100dvh-6rem)] overflow-y-auto">
         {/* Minimal Icon Badge */}
         <div className="w-8 h-8 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
           <FiTrash2 size={14} />

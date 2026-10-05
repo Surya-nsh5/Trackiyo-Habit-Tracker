@@ -13,8 +13,9 @@ interface StreakState {
   isModalOpen: boolean;
   isLoading: boolean;
   error: string | null;
+  lastFetched?: number | null;
 
-  fetchStreaks: () => Promise<void>;
+  fetchStreaks: (force?: boolean) => Promise<void>;
   fetchStreakDetail: (type: string, id: string, openModal?: boolean) => Promise<StreakDetailData | null>;
   openStreakModal: (type: string, id: string) => Promise<void>;
   closeStreakModal: () => void;
@@ -34,7 +35,13 @@ export const useStreakStore = create<StreakState>((set, get) => ({
   isLoading: false,
   error: null,
 
-  fetchStreaks: async () => {
+  lastFetched: null as number | null,
+  fetchStreaks: async (force = false) => {
+    const { lastFetched, isLoading } = get();
+    const now = Date.now();
+    if (!force && lastFetched && (now - lastFetched < 15000)) return;
+    if (isLoading) return;
+
     set({ isLoading: true, error: null });
     try {
       const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
@@ -47,7 +54,8 @@ export const useStreakStore = create<StreakState>((set, get) => ({
           tasks: res.data.tasks || null,
           wellness: res.data.wellness || null,
           graceDays: res.data.graceDays || { available: 2, usedCount: 0 },
-          isLoading: false
+          isLoading: false,
+          lastFetched: Date.now()
         });
       }
     } catch (err: any) {

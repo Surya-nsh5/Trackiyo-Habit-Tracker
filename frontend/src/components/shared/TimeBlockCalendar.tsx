@@ -276,9 +276,9 @@ export const TimeBlockCalendar: React.FC = () => {
 
       {/* Add Block Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center px-4 py-4 overflow-y-auto">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center px-4 py-4 overflow-y-auto safe-pt safe-pb safe-px">
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowAddModal(false)} />
-          <div className="relative bg-surface border border-border/80 rounded-2xl shadow-2xl p-4 sm:p-6 w-full max-w-sm min-w-0 max-h-[calc(100vh-2rem)] overflow-y-auto custom-scrollbar z-10 my-auto">
+          <div className="relative bg-surface border border-border/80 rounded-2xl shadow-2xl p-4 sm:p-6 w-full max-w-sm min-w-0 max-h-[calc(100dvh-2rem-var(--sat)-var(--sab))] overflow-y-auto custom-scrollbar z-10 my-auto">
             <div className="flex items-center justify-between gap-2 min-w-0 mb-5">
               <h3 className="text-sm font-bold text-foreground break-words flex-1 min-w-0">Add Time Block</h3>
               <button onClick={() => setShowAddModal(false)} aria-label="Close add time block dialog" className="p-1 rounded text-muted hover:text-foreground shrink-0">

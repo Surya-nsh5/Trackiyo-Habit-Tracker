@@ -69,7 +69,7 @@ export const WebUpdateBanner: React.FC = () => {
     <div
       role="status"
       aria-live="polite"
-      className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:w-96 z-[999] bg-surface/95 backdrop-blur-md border border-accent/40 shadow-2xl rounded-xl p-4 text-foreground transition-all duration-300 animate-in fade-in slide-in-from-bottom-5"
+      className="fixed bottom-[max(1rem,calc(4.5rem+env(safe-area-inset-bottom,0px)))] sm:bottom-6 left-4 right-4 sm:left-auto sm:right-6 sm:w-96 z-[999] bg-surface/95 backdrop-blur-md border border-accent/40 shadow-2xl rounded-xl p-4 text-foreground transition-all duration-300 animate-in fade-in slide-in-from-bottom-5"
     >
       <div className="flex items-start gap-3">
         <div className="w-8 h-8 rounded-lg bg-accent/15 text-accent flex items-center justify-center shrink-0 mt-0.5">

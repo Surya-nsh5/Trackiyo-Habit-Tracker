@@ -63,7 +63,7 @@ export const AppDownloadSection: React.FC = () => {
   };
 
   return (
-    <section className="relative z-10 px-6 max-w-7xl mx-auto pb-12 w-full min-w-0 box-border" aria-labelledby="apps-download-heading">
+    <section className="relative z-10 px-6 w-full max-w-full pb-12 min-w-0 box-border" aria-labelledby="apps-download-heading">
       <div className="bg-surface border border-border/70 rounded-md p-6 sm:p-10 transition-colors duration-200 min-w-0">
         
         {/* Header & Tabs */}

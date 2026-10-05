@@ -43,11 +43,11 @@ export const AchievementUnlockModal: React.FC = () => {
       role="dialog"
       aria-modal="true"
       aria-labelledby="unlock-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-md animate-fadeIn"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-md animate-fadeIn safe-pt safe-pb safe-px"
       onClick={clearRecentUnlock}
     >
       <div
-        className={`bg-surface border ${tierStyle.border} rounded-2xl w-full max-w-[min(24rem,calc(100vw-2rem))] min-w-0 max-h-[calc(100dvh-2rem)] overflow-y-auto p-6 flex flex-col items-center text-center shadow-2xl ${tierStyle.glow} relative box-border`}
+        className={`bg-surface border ${tierStyle.border} rounded-2xl w-full max-w-[min(24rem,calc(100vw-2rem))] min-w-0 max-h-[calc(100dvh-2rem-var(--sat)-var(--sab))] overflow-y-auto p-6 flex flex-col items-center text-center shadow-2xl ${tierStyle.glow} relative box-border`}
         onClick={e => e.stopPropagation()}
       >
         {/* Close Button */}

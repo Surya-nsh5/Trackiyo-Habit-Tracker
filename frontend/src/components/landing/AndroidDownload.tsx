@@ -53,7 +53,7 @@ export const AndroidDownload: React.FC = () => {
   }, []);
 
   return (
-    <section className="relative z-10 px-6 max-w-7xl mx-auto pb-8 w-full min-w-0 box-border" aria-labelledby="android-download-heading">
+    <section className="relative z-10 px-6 w-full max-w-full pb-8 min-w-0 box-border" aria-labelledby="android-download-heading">
       <div className="bg-surface border border-border/70 rounded-md p-6 sm:p-10 flex flex-col lg:flex-row gap-8 lg:gap-12 items-start transition-colors duration-200 min-w-0">
         <div className="flex-1 w-full min-w-0">
           <p className="text-[11px] font-semibold tracking-[0.16em] text-muted uppercase mb-3 break-words">

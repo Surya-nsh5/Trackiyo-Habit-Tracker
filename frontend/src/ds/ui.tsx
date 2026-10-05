@@ -196,7 +196,7 @@ export const AnimatedNumber: React.FC<{ value: number; format?: (n: number) => s
 export const Container: React.FC<React.HTMLAttributes<HTMLDivElement> & { wide?: boolean }> = ({
   wide, className = '', children, ...rest
 }) => (
-  <div className={`${wide ? 'max-w-[1600px]' : 'max-w-3xl'} w-full mx-auto px-4 sm:px-6 ${className}`} {...rest}>
+  <div className={`w-full max-w-full mx-auto px-4 sm:px-6 ${className}`} {...rest}>
     {children}
   </div>
 );

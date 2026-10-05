@@ -175,11 +175,18 @@ function syncThemeToServer(themeId: ThemeId, mode: ThemeModeSetting) {
   }, 350);
 }
 
+const initialThemeId = readStoredThemeId();
+const initialModeSetting = readStoredMode();
+const initialDark = resolveDark(initialModeSetting);
+
+if (typeof document !== 'undefined') {
+  applyToDocument(initialThemeId, initialDark);
+}
+
 export const useThemeStore = create<ThemeState>((set, get) => ({
-  themeId: readStoredThemeId(),
-  modeSetting: readStoredMode(),
-  // Resolved lazily; initializeTheme() (called on app start) corrects it.
-  isDarkMode: true,
+  themeId: initialThemeId,
+  modeSetting: initialModeSetting,
+  isDarkMode: initialDark,
 
   setThemeId: (themeId: ThemeId) => {
     if (!isThemeId(themeId)) return;

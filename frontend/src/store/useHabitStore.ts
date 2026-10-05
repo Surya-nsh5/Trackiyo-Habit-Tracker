@@ -12,10 +12,12 @@ interface HabitState {
   wellnessLogs: WellnessLog;
   currentMonthId: string;
   isLoading: boolean;
+  lastFetched: Record<string, number>;
+  pendingLogs: Set<string>;
   realtimeChannel: RealtimeChannel | null;
   
   setCurrentMonth: (monthId: string) => Promise<void>;
-  loadData: () => Promise<void>;
+  loadData: (force?: boolean) => Promise<void>;
   toggleHabitLog: (habitId: string, dateStr: string) => Promise<boolean>;
   updateWellnessLog: (dateStr: string, type: 'mood' | 'sleep' | 'energy' | 'water', value: number | null) => Promise<boolean>;
   updateWellnessEntry: (dateStr: string, fields: Partial<WellnessData>) => Promise<boolean>;
@@ -33,6 +35,8 @@ export const useHabitStore = create<HabitState>((set, get) => ({
   wellnessLogs: {},
   currentMonthId: getCurrentMonthId(),
   isLoading: false,
+  lastFetched: {},
+  pendingLogs: new Set<string>(),
   realtimeChannel: null,
 
   setupRealtime: (userId: string) => {
@@ -132,12 +136,22 @@ export const useHabitStore = create<HabitState>((set, get) => ({
   },
 
   setCurrentMonth: async (monthId: string) => {
+    if (get().currentMonthId === monthId && get().habits.length > 0) return;
     set({ currentMonthId: monthId });
     await get().loadData();
   },
 
-  loadData: async () => {
+  loadData: async (force = false) => {
     const monthId = get().currentMonthId;
+    const { lastFetched, habits, isLoading } = get();
+    const now = Date.now();
+
+    // Cache freshness: 15s window per monthId
+    if (!force && lastFetched[monthId] && (now - lastFetched[monthId] < 15000) && habits.length > 0) {
+      return;
+    }
+    if (isLoading) return;
+
     const [year, month] = monthId.split('-');
     const requestId = Symbol('loadData');
     (get() as { _loadRequest?: symbol })._loadRequest = requestId;
@@ -152,7 +166,7 @@ export const useHabitStore = create<HabitState>((set, get) => ({
       // Drop stale responses from rapid month switches.
       if ((get() as { _loadRequest?: symbol })._loadRequest !== requestId) return;
 
-      const habits = habitsRes.data.habits || [];
+      const loadedHabits = habitsRes.data.habits || [];
       const logsArray = habitsRes.data.logs || [];
       
       const newHabitLogs: HabitLog = {};
@@ -173,10 +187,11 @@ export const useHabitStore = create<HabitState>((set, get) => ({
       });
 
       set({
-        habits,
+        habits: loadedHabits,
         habitLogs: newHabitLogs,
         wellnessLogs: newWellnessLogs,
-        isLoading: false
+        isLoading: false,
+        lastFetched: { ...get().lastFetched, [monthId]: Date.now() }
       });
     } catch (error) {
       console.error('Failed to load habit data', error);
@@ -187,20 +202,24 @@ export const useHabitStore = create<HabitState>((set, get) => ({
   },
 
   toggleHabitLog: async (habitId: string, dateStr: string) => {
-    // Date is the source of truth: only today's records are editable.
-    // Previous days are permanently read-only, future days are upcoming.
     if (dateStr !== getLocalTodayStr()) return false;
 
-    const { habitLogs } = get();
     const key = `${habitId}_${dateStr}`;
+    const { habitLogs, pendingLogs } = get();
+
+    // Idempotency: skip if mutation is currently in-flight
+    if (pendingLogs.has(key)) return false;
+
     const isCurrentlyChecked = habitLogs[key] || false;
     const newStatus = !isCurrentlyChecked;
     
+    const nextPending = new Set(pendingLogs).add(key);
     set({
       habitLogs: {
         ...habitLogs,
         [key]: newStatus
-      }
+      },
+      pendingLogs: nextPending
     });
 
     try {
@@ -212,7 +231,7 @@ export const useHabitStore = create<HabitState>((set, get) => ({
       });
       return true;
     } catch (error) {
-      console.error('Failed to toggle habit', error);
+      console.error('Failed to toggle habit log on backend, rolling back', error);
       set({
         habitLogs: {
           ...get().habitLogs,
@@ -220,11 +239,16 @@ export const useHabitStore = create<HabitState>((set, get) => ({
         }
       });
       return false;
+    } finally {
+      set((state) => {
+        const p = new Set(state.pendingLogs);
+        p.delete(key);
+        return { pendingLogs: p };
+      });
     }
   },
 
   updateWellnessLog: async (dateStr: string, type: 'mood' | 'sleep' | 'energy' | 'water', value: number | null) => {
-    // Same daily rule as habits: today only.
     if (dateStr !== getLocalTodayStr()) return false;
 
     const { wellnessLogs } = get();
@@ -252,7 +276,7 @@ export const useHabitStore = create<HabitState>((set, get) => ({
       });
       return true;
     } catch (error) {
-      console.error('Failed to update wellness log', error);
+      console.error('Failed to update wellness log on backend, rolling back', error);
       set({
         wellnessLogs: {
           ...get().wellnessLogs,
@@ -285,7 +309,7 @@ export const useHabitStore = create<HabitState>((set, get) => ({
       });
       return true;
     } catch (error) {
-      console.error('Failed to update wellness entry', error);
+      console.error('Failed to update wellness entry on backend, rolling back', error);
       set({
         wellnessLogs: {
           ...get().wellnessLogs,
@@ -297,14 +321,18 @@ export const useHabitStore = create<HabitState>((set, get) => ({
   },
 
   addHabit: async (name: string, icon: string, monthlyGoal: number, frequency = 'daily', targetDays = 7) => {
+    // Local validation
+    if (!name || !name.trim()) return;
+    const cleanName = name.trim();
+
     const tempId = `temp-${Date.now()}`;
     const { habits } = get();
     
     const optimisticHabit: Habit = {
       id: tempId,
-      name,
-      icon,
-      monthly_goal: monthlyGoal,
+      name: cleanName,
+      icon: icon || '📌',
+      monthly_goal: monthlyGoal || 0,
       frequency,
       target_days_per_week: targetDays,
       order_index: habits.length,
@@ -315,8 +343,8 @@ export const useHabitStore = create<HabitState>((set, get) => ({
     
     try {
       const response = await api.post('/habits', {
-        name,
-        icon,
+        name: cleanName,
+        icon: icon || '📌',
         monthlyGoal,
         frequency,
         target_days_per_week: targetDays,
@@ -324,7 +352,6 @@ export const useHabitStore = create<HabitState>((set, get) => ({
       });
       
       set((state) => {
-        // deduplicate
         if (state.habits.some(h => h.id === response.data.id)) {
            return { habits: state.habits.filter(h => h.id !== tempId) };
         }
@@ -333,7 +360,7 @@ export const useHabitStore = create<HabitState>((set, get) => ({
         };
       });
     } catch (error) {
-      console.error('Failed to add habit', error);
+      console.error('Failed to add habit on backend, rolling back', error);
       set((state) => ({ habits: state.habits.filter(h => h.id !== tempId) }));
     }
   },
@@ -347,7 +374,7 @@ export const useHabitStore = create<HabitState>((set, get) => ({
     try {
       await api.delete(`/habits/${habitId}`);
     } catch (error) {
-      console.error('Failed to delete habit', error);
+      console.error('Failed to delete habit on backend, rolling back', error);
       set((state) => ({ 
         habits: [...state.habits, originalHabit].sort((a, b) => (a.order_index || 0) - (b.order_index || 0)) 
       }));

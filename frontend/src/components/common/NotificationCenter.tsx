@@ -34,7 +34,7 @@ export const NotificationCenter: React.FC<{ onNavigateTab: (tab: string) => void
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-          <div className="absolute right-0 top-12 z-50 w-[calc(100vw-28px)] max-w-[min(24rem,calc(100vw-2rem))] sm:w-96 bg-navbar border border-border rounded-md shadow-2xl overflow-hidden flex flex-col transition-colors max-h-[calc(100dvh-5rem)] min-w-0">
+          <div className="fixed sm:absolute top-[calc(3.5rem+env(safe-area-inset-top,0px))] left-3 right-3 sm:left-auto sm:right-0 sm:top-12 w-auto sm:w-96 max-w-sm sm:max-w-none bg-navbar border border-border/80 rounded-xl shadow-2xl overflow-hidden flex flex-col transition-colors max-h-[calc(100dvh-5rem-env(safe-area-inset-top,0px))] min-w-0 z-50">
             
             {/* Header */}
             <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-border/70 bg-navbar/80 flex-shrink-0 min-w-0">

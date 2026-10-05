@@ -124,7 +124,14 @@ export const HabitGrid: React.FC<HabitGridProps> = ({ onCreateHabit }) => {
     if (inMonth) {
       setSelectedDate(todayStr);
       requestAnimationFrame(() => {
-        rowRefs.current[todayStr]?.scrollIntoView({ block: 'center', behavior: 'auto' });
+        const target = rowRefs.current[todayStr];
+        const container = target?.closest('.overflow-auto');
+        if (target && container) {
+          const cRect = container.getBoundingClientRect();
+          const tRect = target.getBoundingClientRect();
+          const diff = tRect.top - cRect.top;
+          container.scrollTop = Math.max(0, container.scrollTop + diff - (cRect.height / 2) + (tRect.height / 2));
+        }
       });
     } else {
       setSelectedDate((prev) => {

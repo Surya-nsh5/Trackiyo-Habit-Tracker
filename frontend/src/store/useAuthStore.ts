@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import api from '../services/api';
 import { useThemeStore } from './useThemeStore';
+import { useNotificationStore } from './useNotificationStore';
 import { secureAuthStorage } from '../services/secureAuthStorage';
 
 export interface UserNotificationPreferences {
@@ -28,8 +29,6 @@ export interface User {
 interface AuthState {
   isAuthenticated: boolean;
   hasVisited: boolean;
-  // In-memory only — resets to false on every page load.
-  // True only when the user explicitly clicks Login / Sign Up on the landing page.
   showAuth: boolean;
   initialAuthMode: 'login' | 'signup';
   isInitializing: boolean;
@@ -55,13 +54,19 @@ function clearUserCaches() {
     'trackiyo_cached_focus_sessions',
     'trackiyo_cached_gamification',
     'trackiyo_life_areas',
-    'trackiyo_cached_captures'
+    'trackiyo_cached_captures',
+    'trackiyo_read_notifications',
+    'trackiyo_dismissed_notifications'
   ];
   cacheKeys.forEach(k => {
     try {
       localStorage.removeItem(k);
     } catch {}
   });
+
+  try {
+    useNotificationStore.getState().reset();
+  } catch {}
 }
 
 /** Silently swap the access token using the stored refresh token.

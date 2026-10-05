@@ -65,8 +65,8 @@ export const ChallengeDetailModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
-      <div className="bg-surface border border-border/80 rounded-2xl p-5 sm:p-6 max-w-lg w-full min-w-0 space-y-5 shadow-2xl my-8 animate-fadeIn max-h-[calc(100vh-2rem)] overflow-y-auto custom-scrollbar">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto safe-pt safe-pb safe-px">
+      <div className="bg-surface border border-border/80 rounded-2xl p-5 sm:p-6 max-w-lg w-full min-w-0 space-y-5 shadow-2xl my-auto animate-fadeIn max-h-[calc(100dvh-2rem-var(--sat)-var(--sab))] overflow-y-auto custom-scrollbar">
         {/* Header */}
         <div className="flex items-center justify-between gap-3 min-w-0 border-b border-border-subtle pb-3">
           <div className="min-w-0 flex-1">

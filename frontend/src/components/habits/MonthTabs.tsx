@@ -16,7 +16,14 @@ export const MonthTabs: React.FC = () => {
   // off-screen, clipped.
   useEffect(() => {
     const raf = requestAnimationFrame(() => {
-      activeRef.current?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'auto' });
+      const target = activeRef.current;
+      const container = containerRef.current;
+      if (target && container) {
+        const cRect = container.getBoundingClientRect();
+        const tRect = target.getBoundingClientRect();
+        const diff = tRect.left - cRect.left;
+        container.scrollLeft = Math.max(0, container.scrollLeft + diff - (cRect.width / 2) + (tRect.width / 2));
+      }
     });
     return () => cancelAnimationFrame(raf);
   }, [currentMonthId]);
