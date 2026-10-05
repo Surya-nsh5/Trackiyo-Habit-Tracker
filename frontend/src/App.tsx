@@ -8,6 +8,7 @@ import { useThemeStore } from '@/store/useThemeStore';
 import { PWAReloadPrompt } from '@/components/common/PWAReloadPrompt';
 import { initNative } from '@/native';
 import { DesignSystemProvider } from '@/ds/DesignSystemProvider';
+import { PWAInstallBanner } from '@/components/common/PWAInstallBanner';
 import { DeleteConfirmPopup } from '@/components/common/DeleteConfirmPopup';
 
 const DashboardLayout = lazy(() => import('@/components/layout/DashboardLayout').then(m => ({ default: m.DashboardLayout })));
@@ -124,6 +125,7 @@ const App: React.FC = () => {
         <CreateChallengeModal />
       </Suspense>
       <PWAReloadPrompt />
+      <PWAInstallBanner />
       <WebUpdateBanner />
       <NativeUpdateDialog />
       <DeleteConfirmPopup />
